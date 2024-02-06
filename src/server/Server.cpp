@@ -57,11 +57,24 @@ int main() {
             break;
         }
 
+        // 
+        // Packet received form client 1, send packet back to player 1 and player 2 to set the fill color
+        // 
+        // a)
         // Forward message to player 2
         if (player2.send(packet1) != sf::Socket::Done) {
             std::cerr << "Error: Failed to send message to player 2" << std::endl;
             break;
         }
+
+        // also send packet to player 1
+        // b)
+        
+        if (player1.send(packet1) != sf::Socket::Done) {
+            std::cerr << "Error: Failed to send message to player 2" << std::endl;
+            break;
+        }
+        
 
         // Receive message from player 2
         sf::Packet packet2;
@@ -69,12 +82,24 @@ int main() {
             std::cerr << "Error: Failed to receive message from player 2" << std::endl;
             break;
         }
-
+        // 
+        // Packet received from client 2, send packet back to player 1 and player 2 to set the fill color
+        // 
+        // a)
         // Forward message to player 1
         if (player1.send(packet2) != sf::Socket::Done) {
             std::cerr << "Error: Failed to send message to player 1" << std::endl;
             break;
         }
+        // b)
+        
+        if (player2.send(packet2) != sf::Socket::Done) {
+            std::cerr << "Error: Failed to send message to player 1" << std::endl;
+            break;
+        }
+        
+
+
     }
 
     // Close connections
