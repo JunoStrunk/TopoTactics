@@ -10,9 +10,17 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(TopoTactics src/main.cpp)
-target_link_libraries(TopoTactics PRIVATE sfml-graphics)
-target_compile_features(TopoTactics PRIVATE cxx_std_17)
+add_executable(TTServer src/Server/Server.cpp)
+target_link_libraries(TTServer PRIVATE sfml-graphics)
+target_link_libraries(TTServer PRIVATE sfml-window)
+target_link_libraries(TTServer PRIVATE sfml-network)
+target_compile_features(TTServer PRIVATE cxx_std_17)
+
+add_executable(TTClient src/Client/Client.cpp)
+target_link_libraries(TTClient PRIVATE sfml-graphics)
+target_link_libraries(TTClient PRIVATE sfml-window)
+target_link_libraries(TTClient PRIVATE sfml-network)
+target_compile_features(TTClient PRIVATE cxx_std_17)
 
 if(WIN32)
     add_custom_command(
@@ -22,4 +30,5 @@ if(WIN32)
         VERBATIM)
 endif()
 
-install(TARGETS TopoTactics)
+install(TARGETS TTServer)
+install(TARGETS TTClient)
