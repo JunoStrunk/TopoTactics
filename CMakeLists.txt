@@ -4,23 +4,25 @@ project(TopoTactics LANGUAGES CXX)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-include(FetchContent)
-FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.x)
-FetchContent_MakeAvailable(SFML)
+# Find SFML
+find_package(SFML 2.5 COMPONENTS system window graphics network REQUIRED)
 
-add_executable(TTServer src/Server/Server.cpp)
-target_link_libraries(TTServer PRIVATE sfml-graphics)
-target_link_libraries(TTServer PRIVATE sfml-window)
-target_link_libraries(TTServer PRIVATE sfml-network)
+include_directories("${CMAKE_SOURCE_DIR}/headers" "${CMAKE_SOURCE_DIR}/headers/Cards"  "${CMAKE_SOURCE_DIR}/headers/Board")
+file(GLOB_RECURSE SERVERSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Server/*.cpp")
+file(GLOB_RECURSE CLIENTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
+file(GLOB_RECURSE TESTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/Test.cpp")
+
+add_executable(TTServer ${SERVERSRC})
+target_link_libraries(TTServer sfml-system sfml-window sfml-graphics sfml-network)
 target_compile_features(TTServer PRIVATE cxx_std_17)
 
-add_executable(TTClient src/Client/Client.cpp)
-target_link_libraries(TTClient PRIVATE sfml-graphics)
-target_link_libraries(TTClient PRIVATE sfml-window)
-target_link_libraries(TTClient PRIVATE sfml-network)
+add_executable(TTClient ${CLIENTSRC})
+target_link_libraries(TTClient sfml-system sfml-window sfml-graphics sfml-network)
 target_compile_features(TTClient PRIVATE cxx_std_17)
+
+add_executable(Test ${TESTSRC})
+target_link_libraries(Test sfml-system sfml-window sfml-graphics)
+target_compile_features(Test PRIVATE cxx_std_17)
 
 if(WIN32)
     add_custom_command(
@@ -32,3 +34,4 @@ endif()
 
 install(TARGETS TTServer)
 install(TARGETS TTClient)
+install(TARGETS Test)
