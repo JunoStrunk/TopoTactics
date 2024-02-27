@@ -99,39 +99,40 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 	while (true)
 	{
 		sf::Packet receivedPacket;
-		if (socket.receive(receivedPacket) == sf::Socket::Done)
+		if (socket.receive(receivedPacket) != sf::Socket::Done) {
+			// We may need to handle an error, for now we can just break the while loop.
+			break;
+		}
+		
+		// int nodeNum;
+		// std::string color;
+		int id;
+		std::string color;
+		std::string playerTurn;
+		receivedPacket >> id >> color >> playerTurn;
+
+		std::cout << "id " << id << " color: " << color << " player turn: " << playerTurn << std::endl;
+		client.setPlayerTurn(playerTurn);
+
+		sf::Color fillColor;
+
+		if (color == "blue")
 		{
 
-			// int nodeNum;
-			// std::string color;
-			int id;
-			std::string color;
-			std::string playerTurn;
-			receivedPacket >> id >> color >> playerTurn;
-
-			std::cout << "id " << id << " color: " << color << " player turn: " << playerTurn << std::endl;
-			client.setPlayerTurn(playerTurn);
-
-			sf::Color fillColor;
-
-			if (color == "blue")
-			{
-
-				fillColor = sf::Color::Blue;
-				// board.getVertex(id)->setFillColor(fillColor);
-			}
-			else
-			{
-				fillColor = sf::Color::Green;
-				// board.getVertex(id)->setFillColor(fillColor);
-			}
-
-			board.getVertex(id)->setFillColor(fillColor);
-
-			// deselect node
-			// board.getVertex(id)->setSelected(false);
-			// board.getVertex(id)->setHovered(false);
+			fillColor = sf::Color::Blue;
+			// board.getVertex(id)->setFillColor(fillColor);
 		}
+		else
+		{
+			fillColor = sf::Color::Green;
+			// board.getVertex(id)->setFillColor(fillColor);
+		}
+
+		board.getVertex(id)->setFillColor(fillColor);
+
+		// deselect node
+		// board.getVertex(id)->setSelected(false);
+		// board.getVertex(id)->setHovered(false);
 	}
 }
 
@@ -205,8 +206,8 @@ int main()
 	}
 
 	// Disconnect from the server
-	receiveThread.join();
 	socket.disconnect();
+	receiveThread.join();
 
 	return 0;
 }
