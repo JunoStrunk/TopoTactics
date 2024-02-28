@@ -6,7 +6,7 @@
 #include <iostream>
 #include <thread>
 // client
-const sf::IpAddress IP = "192.168.50.223";
+const sf::IpAddress IP = "";
 // const sf::IpAddress IP = sf::IpAddress::getLocalAddress();
 const int PORT = 2222;
 
