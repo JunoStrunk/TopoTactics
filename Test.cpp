@@ -17,7 +17,8 @@ int main()
 
 	// Create the main window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Test window");
-	ImGui::SFML::Init(window);
+	if(!(ImGui::SFML::Init(window)))
+		return -1;
 	sf::Clock deltaClock;
 
 	CardProps cardProps;

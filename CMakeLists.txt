@@ -5,7 +5,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Find SFML
-find_package(SFML 2.5 COMPONENTS system window graphics network REQUIRED)
+# find_package(SFML 2.5 COMPONENTS system window graphics network REQUIRED)
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
 
 # Find OpenGL package
 find_package(OpenGL REQUIRED)
@@ -48,14 +53,6 @@ target_link_libraries(Test sfml-system sfml-window sfml-graphics OpenGL::GL)
 target_include_directories(Test PRIVATE ${IMGUI_DIR})
 target_include_directories(Test PRIVATE ${INCLUDE_DIR})
 target_compile_features(Test PRIVATE cxx_std_17)
-
-if(WIN32)
-    add_custom_command(
-        TARGET TopoTactics
-        COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:TopoTactics>
-        VERBATIM)
-endif()
 
 install(TARGETS TTServer)
 install(TARGETS TTClient)
