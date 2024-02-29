@@ -2,14 +2,14 @@
 
 void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
+	for (sf::VertexArray line : edges)
+		target.draw(line);
+
 	// Printing the contents of the map
 	for (const auto &pair : graph)
 	{
 		target.draw(pair.second.first->getShape());
 	}
-
-	for (sf::VertexArray line : edges)
-		target.draw(line);
 }
 
 Vertex *Board::getVertex(int key)

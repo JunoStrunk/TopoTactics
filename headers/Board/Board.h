@@ -10,7 +10,7 @@
 class Board : public sf::Drawable
 {
 private:
-	std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph; // Key: From vertex's boundaries, Value pair<from, to vector>
+	std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph; // Key: , Value pair<from, to vector>
 	std::vector<sf::VertexArray> edges;
 
 public:

@@ -1,5 +1,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include "imgui.h"
+#include "imgui-SFML.h"
 #include "Card.h"
 #include "CardProps.h"
 #include "VertexProps.h"
@@ -15,6 +17,8 @@ int main()
 
 	// Create the main window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Test window");
+	ImGui::SFML::Init(window);
+	sf::Clock deltaClock;
 
 	CardProps cardProps;
 	VertexProps vertexProps;
@@ -46,6 +50,7 @@ int main()
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			ImGui::SFML::ProcessEvent(window, event);
 			// Close window: exit
 			if (event.type == sf::Event::Closed)
 				window.close();
@@ -59,12 +64,18 @@ int main()
 			}
 		}
 
-		window.draw(board);
+		ImGui::SFML::Update(window, deltaClock.restart());
 
+		ImGui::Begin("Hello World!");
+		ImGui::Button("Look at this pretty button");
+		ImGui::End();
+
+		window.draw(board);
+		ImGui::SFML::Render(window);
 		// Update the window
 		window.display();
 	}
-
+	ImGui::SFML::Shutdown();
 	delete v1;
 	delete v2;
 	delete v3;
