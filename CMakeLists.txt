@@ -26,6 +26,10 @@ include_directories("${CMAKE_SOURCE_DIR}/headers" "${CMAKE_SOURCE_DIR}/headers/C
 file(GLOB_RECURSE SERVERSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Server/*.cpp")
 file(GLOB_RECURSE CLIENTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
 file(GLOB_RECURSE TESTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/Test.cpp")
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/Board/files/board1.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(GLOB MY_FILES "*.txt") 
+#file(COPY ${MY_FILES} DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY ${MY_FILES} DESTINATION ${CMAKE_BINARY_DIR})
 
 # ImGui source files
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/imgui")
