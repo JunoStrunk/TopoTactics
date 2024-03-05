@@ -4,6 +4,7 @@
 #include "Board.h"
 #include "Card.h"
 #include <iostream>
+#include <fstream>
 #include <thread>
 // client
 const sf::IpAddress IP = "";
@@ -136,6 +137,82 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 	}
 }
 
+void loadBoard(std::ifstream &boardFile, VertexProps &vertexProps, Board &board, std::vector<Vertex*> &vertices) 
+{
+	vertices.clear();
+	std::string line;
+	std::string delimiter = ",";
+	size_t pos = 0;
+	std::string token;
+
+	getline(boardFile, line);
+
+	int numV = std::stoi(line);
+
+	for (int i = 0; i < numV; i++)
+	{
+		getline(boardFile, line);
+
+		// get vertex id
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		int vID = std::stoi(token);
+		line.erase(0, pos + delimiter.length());
+
+		// get x position
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		float xpos = std::stof(token);
+		line.erase(0, pos + delimiter.length());
+
+		// get y position
+		float ypos = std::stof(line);
+
+		// create vertex
+		Vertex* vertex = new Vertex(vID, xpos, ypos, &vertexProps);
+		vertices.push_back(vertex);
+
+	}
+
+	// create edges
+	for (int i = 0; i < numV; i++)
+	{
+		getline(boardFile, line);
+
+		// vertex id 
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		int vID = std::stoi(token);
+		line.erase(0, pos + delimiter.length());
+
+		// edges
+		while ((pos = line.find(delimiter)) != std::string::npos) 
+		{
+			token = line.substr(0, pos);
+			int endpointID = std::stoi(token);
+			//board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
+
+			for (int j = 0; j < vertices.size(); j++) 
+			{
+				if (vertices[j]->getId() == endpointID) 	
+					board.addConnection(vertices[i], vertices[j]);
+			}
+
+			line.erase(0, pos + delimiter.length());
+		}
+
+		int endpointID = std::stoi(line);
+		//board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
+		
+		for (int j = 0; j < vertices.size(); j++) 
+		{
+			if (vertices[j]->getId() == endpointID) 
+				board.addConnection(vertices[i], vertices[j]);
+		}
+
+	}
+}
+
 int main()
 {
 	// window
@@ -155,12 +232,22 @@ int main()
 	CardProps cardProps;
 	VertexProps vertexProps;
 	Board board;
+	std::vector<Vertex*> vertices;
 
-	Vertex *v1 = new Vertex(1, 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	Vertex *v2 = new Vertex(2, (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	board.addConnection(v1, v2);
-	Vertex *v3 = new Vertex(3, 2 * (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	board.addConnection(v2, v3);
+	std::ifstream boardFile("../files/board1.txt");
+
+	if (!boardFile.is_open())
+		std::cout << "file not opened" << std::endl;
+	else	
+		loadBoard(boardFile, vertexProps, board, vertices);
+	
+	boardFile.close();
+	
+	//Vertex *v1 = new Vertex(1, 100, vertexProps.NODE_SIZE + 10, &vertexProps);
+	//Vertex *v2 = new Vertex(2, (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
+	//board.addConnection(v1, v2);
+	//Vertex *v3 = new Vertex(3, 2 * (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
+	//board.addConnection(v2, v3);
 
 	// Start the message receiving thread
 	std::thread receiveThread(receiveMessages, std::ref(socket), std::ref(board), std::ref(client));
