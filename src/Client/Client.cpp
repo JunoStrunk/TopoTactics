@@ -234,7 +234,7 @@ int main()
 	Board board;
 	std::vector<Vertex*> vertices;
 
-	std::ifstream boardFile("board1.txt");
+	std::ifstream boardFile("../files/board1.txt");
 
 	if (!boardFile.is_open())
 		std::cout << "file not opened" << std::endl;
