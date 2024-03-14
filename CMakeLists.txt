@@ -22,10 +22,10 @@ ${CMAKE_SOURCE_DIR}/headers/Board
 ${CMAKE_SOURCE_DIR}/imgui
 )
 
-include_directories("${CMAKE_SOURCE_DIR}/headers" "${CMAKE_SOURCE_DIR}/headers/Cards"  "${CMAKE_SOURCE_DIR}/headers/Board" "${CMAKE_SOURCE_DIR}/imgui")
-file(GLOB_RECURSE SERVERSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Server/*.cpp")
-file(GLOB_RECURSE CLIENTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
-file(GLOB_RECURSE TESTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/Test.cpp")
+include_directories("${CMAKE_SOURCE_DIR}/headers" "${CMAKE_SOURCE_DIR}/headers/Cards"  "${CMAKE_SOURCE_DIR}/headers/Board" "${CMAKE_SOURCE_DIR}/headers/UI" "${CMAKE_SOURCE_DIR}/imgui")
+file(GLOB_RECURSE SERVERSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/UI/*.cpp" "${CMAKE_SOURCE_DIR}/src/Server/*.cpp")
+file(GLOB_RECURSE CLIENTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/UI/*.cpp" "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
+file(GLOB_RECURSE TESTSRC "${CMAKE_SOURCE_DIR}/src/Board/*.cpp" "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp" "${CMAKE_SOURCE_DIR}/src/UI/*.cpp" "${CMAKE_SOURCE_DIR}/Test.cpp")
 # text file directory
 file(COPY "${CMAKE_SOURCE_DIR}/src/Board/files" DESTINATION "${CMAKE_BINARY_DIR}")
 

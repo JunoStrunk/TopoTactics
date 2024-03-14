@@ -1,5 +1,13 @@
 #include "Board.h"
 
+Board::~Board()
+{
+	for (const auto &pair : graph)
+	{
+		delete pair.second.first;
+	}
+}
+
 void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	for (sf::VertexArray line : edges)
@@ -9,6 +17,88 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	for (const auto &pair : graph)
 	{
 		target.draw(pair.second.first->getShape());
+	}
+}
+
+void Board::loadBoard(const char *boardPath, VertexProps &vertexProps)
+{
+	std::ifstream boardFile(boardPath);
+
+	if (!boardFile.is_open())
+	{
+		std::cout << "file not opened" << std::endl;
+		return;
+	}
+
+	std::vector<Vertex *> vertices;
+	std::string line;
+	std::string delimiter = ",";
+	size_t pos = 0;
+	std::string token;
+
+	getline(boardFile, line);
+
+	int numV = std::stoi(line);
+
+	for (int i = 0; i < numV; i++)
+	{
+		getline(boardFile, line);
+
+		// get vertex id
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		int vID = std::stoi(token);
+		line.erase(0, pos + delimiter.length());
+
+		// get x position
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		float xpos = std::stof(token);
+		line.erase(0, pos + delimiter.length());
+
+		// get y position
+		float ypos = std::stof(line);
+
+		// create vertex
+		Vertex *vertex = new Vertex(vID, xpos, ypos, &vertexProps);
+		vertices.push_back(vertex);
+	}
+
+	// create edges
+	for (int i = 0; i < numV; i++)
+	{
+		getline(boardFile, line);
+
+		// vertex id
+		pos = line.find(delimiter);
+		token = line.substr(0, pos);
+		int vID = std::stoi(token);
+		line.erase(0, pos + delimiter.length());
+
+		// edges
+		while ((pos = line.find(delimiter)) != std::string::npos)
+		{
+			token = line.substr(0, pos);
+			int endpointID = std::stoi(token);
+			// board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
+
+			for (int j = 0; j < vertices.size(); j++)
+			{
+				if (vertices[j]->getId() == endpointID)
+					addConnection(vertices[i], vertices[j]);
+			}
+
+			line.erase(0, pos + delimiter.length());
+		}
+
+		int endpointID = std::stoi(line);
+		// board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
+
+		for (int j = 0; j < vertices.size(); j++)
+		{
+			if (vertices[j]->getId() == endpointID)
+				addConnection(vertices[i], vertices[j]);
+		}
 	}
 }
 
@@ -51,6 +141,7 @@ void Board::addConnection(Vertex *from, Vertex *to)
 	edges.push_back(line);
 }
 
+// Move this to shader??
 void Board::mouseMoved(sf::Event &event)
 {
 	for (auto &pair : graph)

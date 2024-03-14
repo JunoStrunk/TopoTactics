@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <vector>
 #include <map>
@@ -15,8 +16,9 @@ private:
 
 public:
 	Board(){};
-	~Board(){};
+	~Board();
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+	void loadBoard(const char *boardPath, VertexProps &vertexProps);
 	Vertex *getVertex(int key);
 	void printIds();
 
