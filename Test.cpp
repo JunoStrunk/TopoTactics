@@ -3,43 +3,53 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include "Card.h"
+#include "Button.h"
+#include "TextureManager.h"
 #include "CardProps.h"
 #include "VertexProps.h"
 #include "Board.h"
 
+static Board board;
+
+void printMessage(std::string msg)
+{
+	std::cout << msg << std::endl;
+}
+
+void imGuiWindow()
+{
+	ImGui::Begin("Edit Board");
+	ImGui::Checkbox("Editable", board.getEditing());
+	ImGui::End();
+}
+
 int main()
 {
-
-	// window
+	// Window Properties
 	const sf::Color WINDOW_COLOR = sf::Color::White;
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
 	// Create the main window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Test window");
-	if(!(ImGui::SFML::Init(window)))
+	if (!(ImGui::SFML::Init(window)))
 		return -1;
 	sf::Clock deltaClock;
 
+	// Create Texture Manager
+	TextureManager textureManager;
+	textureManager.LoadTexture("UI/continue");
+	textureManager.LoadTexture("UI/continue_clicked");
+
+	// Create Board
 	CardProps cardProps;
 	VertexProps vertexProps;
-	Board board;
+	board.loadBoard("../files/board1.txt", vertexProps);
 
-	// create nodes
-	// for (int i = 0; i < vertexProps.NUM_NODES; i++)
-	// {
-	// 	float x = i * (vertexProps.NODE_SIZE + 100) + 100;
-	// 	float y = vertexProps.NODE_SIZE + 10;
-
-	// 	Vertex *v = new Vertex(x, y, &vertexProps);
-	// 	board.addVertex(v);
-	// }
-
-	Vertex *v1 = new Vertex(1, 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	Vertex *v2 = new Vertex(2, (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	board.addConnection(v1, v2);
-	Vertex *v3 = new Vertex(3, 2 * (vertexProps.NODE_SIZE + 100) + 100, vertexProps.NODE_SIZE + 10, &vertexProps);
-	board.addConnection(v2, v3);
+	// Create Button
+	Button continueButton(&(textureManager.GetTexture("UI/continue")), &(textureManager.GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
+	std::function<void()> continueButtonTest = std::bind(printMessage, "ContinueButtonWorks!");
+	continueButton.bindOnClick(continueButtonTest);
 
 	// Start the game loop
 	while (window.isOpen())
@@ -57,7 +67,11 @@ int main()
 				window.close();
 			if (event.type == sf::Event::MouseButtonReleased)
 			{
-				board.mouseClick(event);
+				board.mouseReleased(event);
+			}
+			if (event.type == sf::Event::MouseButtonPressed)
+			{
+				board.mousePressed(event);
 			}
 			if (event.type == sf::Event::MouseMoved)
 			{
@@ -67,19 +81,15 @@ int main()
 
 		ImGui::SFML::Update(window, deltaClock.restart());
 
-		ImGui::Begin("Hello World!");
-		ImGui::Button("Look at this pretty button");
-		ImGui::End();
+		imGuiWindow();
 
 		window.draw(board);
+		window.draw(continueButton);
 		ImGui::SFML::Render(window);
-		// Update the window
+
 		window.display();
 	}
 	ImGui::SFML::Shutdown();
-	delete v1;
-	delete v2;
-	delete v3;
 
 	return EXIT_SUCCESS;
 }

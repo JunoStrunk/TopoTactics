@@ -13,6 +13,7 @@ class Vertex : public sf::Drawable
 	sf::CircleShape shape;
 	bool hovered;
 	bool selected;
+	bool draggable;
 	float xpos;
 	float ypos;
 
@@ -32,10 +33,13 @@ public:
 	sf::Color getColor();
 	bool isHovered();
 	bool isSelected() const;
+	bool isDraggable() const;
 
 	// Setters
 	void setHovered(bool hover);
 	void setSelected(bool select);
+	void setDraggable(bool draggable);
 	void setFillColor(sf::Color color);
 	void setOutlineColor(sf::Color color);
+	void setCoords(float x, float y);
 };

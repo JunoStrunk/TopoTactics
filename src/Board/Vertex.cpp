@@ -15,6 +15,7 @@ Vertex::Vertex(int id, float x, float y, VertexProps *props)
 	this->props = props;
 	hovered = false;
 	selected = false;
+	draggable = false;
 }
 
 void Vertex::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -63,17 +64,12 @@ bool Vertex::isSelected() const
 	return selected;
 }
 
+bool Vertex::isDraggable() const
+{
+	return draggable;
+}
+
 /*======= Setters =============================*/
-
-void Vertex::setFillColor(sf::Color color)
-{
-	shape.setFillColor(color);
-}
-
-void Vertex::setOutlineColor(sf::Color color)
-{
-	shape.setOutlineColor(color);
-}
 
 void Vertex::setHovered(bool hover)
 {
@@ -96,4 +92,26 @@ void Vertex::setSelected(bool select)
 	// 	selected = true;
 	// 	setFillColor(props->NODE_FILL_HOVER_COLOR);
 	// }
+}
+
+void Vertex::setDraggable(bool draggable)
+{
+	this->draggable = draggable;
+}
+
+void Vertex::setFillColor(sf::Color color)
+{
+	shape.setFillColor(color);
+}
+
+void Vertex::setOutlineColor(sf::Color color)
+{
+	shape.setOutlineColor(color);
+}
+
+void Vertex::setCoords(float x, float y)
+{
+	xpos = x;
+	ypos = y;
+	shape.setPosition(xpos, ypos);
 }

@@ -2,7 +2,9 @@
 #include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
 #include "Board.h"
+#include "Button.h"
 #include "Card.h"
+#include "TextureManager.h"
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -13,6 +15,11 @@ const int PORT = 2222;
 
 /*======= Serialization ========================*/
 sf::Packet &operator<<(sf::Packet &packet, const Vertex &m);
+
+void printMessage(std::string msg)
+{
+	std::cout << msg << std::endl;
+}
 
 class Client
 {
@@ -138,100 +145,36 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 	}
 }
 
-// void loadBoard(std::ifstream &boardFile, VertexProps &vertexProps, Board &board, std::vector<Vertex *> &vertices)
-// {
-// 	vertices.clear();
-// 	std::string line;
-// 	std::string delimiter = ",";
-// 	size_t pos = 0;
-// 	std::string token;
-
-// 	getline(boardFile, line);
-
-// 	int numV = std::stoi(line);
-
-// 	for (int i = 0; i < numV; i++)
-// 	{
-// 		getline(boardFile, line);
-
-// 		// get vertex id
-// 		pos = line.find(delimiter);
-// 		token = line.substr(0, pos);
-// 		int vID = std::stoi(token);
-// 		line.erase(0, pos + delimiter.length());
-
-// 		// get x position
-// 		pos = line.find(delimiter);
-// 		token = line.substr(0, pos);
-// 		float xpos = std::stof(token);
-// 		line.erase(0, pos + delimiter.length());
-
-// 		// get y position
-// 		float ypos = std::stof(line);
-
-// 		// create vertex
-// 		Vertex *vertex = new Vertex(vID, xpos, ypos, &vertexProps);
-// 		vertices.push_back(vertex);
-// 	}
-
-// 	// create edges
-// 	for (int i = 0; i < numV; i++)
-// 	{
-// 		getline(boardFile, line);
-
-// 		// vertex id
-// 		pos = line.find(delimiter);
-// 		token = line.substr(0, pos);
-// 		int vID = std::stoi(token);
-// 		line.erase(0, pos + delimiter.length());
-
-// 		// edges
-// 		while ((pos = line.find(delimiter)) != std::string::npos)
-// 		{
-// 			token = line.substr(0, pos);
-// 			int endpointID = std::stoi(token);
-// 			// board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
-
-// 			for (int j = 0; j < vertices.size(); j++)
-// 			{
-// 				if (vertices[j]->getId() == endpointID)
-// 					board.addConnection(vertices[i], vertices[j]);
-// 			}
-
-// 			line.erase(0, pos + delimiter.length());
-// 		}
-
-// 		int endpointID = std::stoi(line);
-// 		// board.addConnection(board.getVertex(vID), board.getVertex(endpointID));
-
-// 		for (int j = 0; j < vertices.size(); j++)
-// 		{
-// 			if (vertices[j]->getId() == endpointID)
-// 				board.addConnection(vertices[i], vertices[j]);
-// 		}
-// 	}
-// }
-
 int main()
 {
-	// window
+	// Window
 	const sf::Color WINDOW_COLOR = sf::Color::White;
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
-	// create client object and initialize with socket
+	// Create client object and initialize with socket
 	Client client;
 	sf::TcpSocket socket;
 	client.initailize(socket);
 
-	// setup window and initialize game elements
+	// Setup window and initialize game elements
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "TopoTactics!");
 
-	// create Board
+	// Create Texture Manager
+	TextureManager textureManager;
+	textureManager.LoadTexture("UI/continue");
+	textureManager.LoadTexture("UI/continue_clicked");
+
+	// Create Board
 	CardProps cardProps;
 	VertexProps vertexProps;
 	Board board;
 	board.loadBoard("../files/board1.txt", vertexProps);
+
+	// Create Button
+	Button continueButton(&(textureManager.GetTexture("UI/continue")), &(textureManager.GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
+	std::function<void()> continueButtonTest = std::bind(printMessage, "ContinueButtonWorks!");
+	continueButton.bindOnClick(continueButtonTest);
 
 	// Start the message receiving thread
 	std::thread receiveThread(receiveMessages, std::ref(socket), std::ref(board), std::ref(client));
@@ -260,9 +203,14 @@ int main()
 			{
 				if (event.type == sf::Event::MouseButtonReleased)
 				{
-					Vertex *v = board.mouseClick(event);
+					Vertex *v = board.mouseReleased(event);
 					if (v != nullptr)
 						client.sendCircleColorPacket(v, socket);
+					continueButton.mouseReleased(event);
+				}
+				if (event.type == sf::Event::MouseButtonPressed)
+				{
+					continueButton.mousePressed(event);
 				}
 				if (event.type == sf::Event::MouseMoved)
 				{
@@ -272,6 +220,7 @@ int main()
 		}
 
 		window.draw(board);
+		window.draw(continueButton);
 
 		window.display();
 	}

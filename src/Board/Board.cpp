@@ -107,12 +107,22 @@ Vertex *Board::getVertex(int key)
 	return graph.at(key).first;
 }
 
+bool *Board::getEditing()
+{
+	return &editing;
+}
+
 void Board::printIds()
 {
 	for (const auto &pair : graph)
 	{
 		std::cout << "Key: " << pair.first << " Vertex ID: " << pair.second.first->getId() << "\n";
 	}
+}
+
+void Board::setEditing(bool editing)
+{
+	this->editing = editing;
 }
 
 bool Board::addVertex(Vertex *v)
@@ -150,21 +160,41 @@ void Board::mouseMoved(sf::Event &event)
 			pair.second.first->setHovered(true);
 		else
 			pair.second.first->setHovered(false);
+		if (pair.second.first->isDraggable())
+		{
+			pair.second.first->setCoords(event.mouseMove.x, event.mouseMove.y);
+		}
 	}
 }
 
-Vertex *Board::mouseClick(sf::Event &event)
+Vertex *Board::mouseReleased(sf::Event &event)
 {
 	Vertex *selected = nullptr;
 	for (auto &pair : graph)
 	{
-		if (pair.second.first->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
+		if (!editing && pair.second.first->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
 		{
 			pair.second.first->setSelected(true);
 			selected = pair.second.first;
 		}
+		else
+		{
+			pair.second.first->setDraggable(false);
+		}
 	}
+
 	if (selected != nullptr)
 		std::cout << "Clicked ID: " << selected->getId() << "\n";
 	return selected;
+}
+
+void Board::mousePressed(sf::Event &event)
+{
+	for (auto &pair : graph)
+	{
+		if (editing && pair.second.first->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
+		{
+			pair.second.first->setDraggable(true);
+		}
+	}
 }
