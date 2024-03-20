@@ -38,8 +38,8 @@ int main()
 	std::cout << "Player 2 connected" << std::endl;
 
 	// Assign player identities and player turn packets
-	std::string playerIdentity = "Player1";
-	std::string playerTurn = "Player1";
+	std::string playerIdentity = "Player 1";
+	std::string playerTurn = "Player 1";
 
 	sf::Packet identityPacket;
 	identityPacket << playerIdentity << playerTurn;
@@ -50,7 +50,7 @@ int main()
 		return 1;
 	}
 
-	playerIdentity = "Player2";
+	playerIdentity = "Player 2";
 	identityPacket.clear();
 	identityPacket << playerIdentity << playerTurn;
 
@@ -74,14 +74,7 @@ int main()
 		else if (player1Status == sf::Socket::Done)
 		{
 
-			int i;
-			std::string s;
-			// packet1 >> i >> s;
-			// packet1.clear();
-
-			// std::cout << "Received message from player 1, Node: " << i << " color: " << s << std::endl;
-
-			playerTurn = "Player2";
+			playerTurn = "Player 2";
 			packet1 << playerTurn;
 		}
 
@@ -115,15 +108,7 @@ int main()
 		else if (player2Status == sf::Socket::Done)
 		{
 
-			int i;
-			std::string s;
-
-			// packet2 >> i >> s;
-			// packet2.clear();
-
-			// std::cout << "Received message from player 2, Node: " << i << " color: " << s << std::endl;
-
-			playerTurn = "Player1";
+			playerTurn = "Player 1";
 			packet2 << playerTurn;
 		}
 
