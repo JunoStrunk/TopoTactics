@@ -18,6 +18,10 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	{
 		target.draw(pair.second.first->getShape());
 	}
+
+	for (Piece* piece : pieces) {
+		target.draw(piece->getSprite());
+	}
 }
 
 void Board::loadBoard(const char *boardPath, VertexProps &vertexProps)
@@ -119,6 +123,10 @@ void Board::printIds()
 		std::cout << "Key: " << pair.first << " Vertex ID: " << pair.second.first->getId() << "\n";
 	}
 }
+std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getVertexGraph()
+{
+	return graph;
+}
 
 void Board::setEditing(bool editing)
 {
@@ -149,6 +157,14 @@ void Board::addConnection(Vertex *from, Vertex *to)
 	line[0].color = sf::Color::Black;
 	line[1].color = sf::Color::Black;
 	edges.push_back(line);
+}
+
+void Board::addPiece(Piece *piece) {
+	pieces.push_back(piece);
+}
+
+std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection() {
+	return graph;
 }
 
 // Move this to shader??
@@ -197,4 +213,27 @@ void Board::mousePressed(sf::Event &event)
 			pair.second.first->setDraggable(true);
 		}
 	}
+}
+
+Piece *Board::mouseClickPiece(sf::Event &event, std::vector<Piece*> &pieces) 
+{
+	Piece *selected = nullptr;
+	for (Piece *piece : pieces) 
+	{
+		
+		if (piece->getSprite().getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) 
+		{
+			
+			piece->setSelected(true);
+			selected = piece;
+			break;
+		}
+		
+		//if (piece->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) 
+		//{
+		//	piece->setSelected(true);
+		//	selected = piece;
+		//}
+	}
+	return selected;
 }

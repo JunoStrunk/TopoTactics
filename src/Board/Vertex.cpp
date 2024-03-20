@@ -16,6 +16,7 @@ Vertex::Vertex(int id, float x, float y, VertexProps *props)
 	hovered = false;
 	selected = false;
 	draggable = false;
+	hasPiece = false;
 }
 
 void Vertex::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -54,6 +55,11 @@ sf::Color Vertex::getColor()
 	return shape.getFillColor();
 }
 
+sf::Color Vertex::getOutlineColor() 
+{
+	return shape.getOutlineColor();
+}
+
 bool Vertex::isHovered()
 {
 	return hovered;
@@ -67,6 +73,19 @@ bool Vertex::isSelected() const
 bool Vertex::isDraggable() const
 {
 	return draggable;
+}
+
+std::string Vertex::getPlayer() 
+{
+	return playerIdentity;
+}
+bool Vertex::getIsHappy() 
+{
+	return isHappy;
+}
+bool Vertex::getHasPiece() 
+{
+	return hasPiece;
 }
 
 /*======= Setters =============================*/
@@ -114,4 +133,18 @@ void Vertex::setCoords(float x, float y)
 	xpos = x;
 	ypos = y;
 	shape.setPosition(xpos, ypos);
+} 
+
+void Vertex::setIsHappy(bool happy) 
+{
+	isHappy = happy;
+}
+
+void Vertex::setHasPiece(bool hasPiece) 
+{
+	this->hasPiece = hasPiece;
+}
+void Vertex::setPlayer(std::string identity) 
+{
+	playerIdentity = identity;
 }

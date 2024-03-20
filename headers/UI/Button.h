@@ -1,3 +1,4 @@
+#include <functional>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #pragma once

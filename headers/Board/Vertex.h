@@ -16,6 +16,9 @@ class Vertex : public sf::Drawable
 	bool draggable;
 	float xpos;
 	float ypos;
+	bool isHappy;
+	bool hasPiece; 
+	std::string playerIdentity;
 
 public:
 	// Vertex constructor
@@ -31,9 +34,13 @@ public:
 	sf::FloatRect getGlobalBounds() const;
 	sf::CircleShape getShape();
 	sf::Color getColor();
+	sf::Color getOutlineColor();
 	bool isHovered();
 	bool isSelected() const;
 	bool isDraggable() const;
+	bool getIsHappy();
+	bool getHasPiece();
+	std::string getPlayer();
 
 	// Setters
 	void setHovered(bool hover);
@@ -42,4 +49,7 @@ public:
 	void setFillColor(sf::Color color);
 	void setOutlineColor(sf::Color color);
 	void setCoords(float x, float y);
+	void setIsHappy(bool happy);
+	void setHasPiece(bool hasPiece);
+	void setPlayer(std::string identity);
 };
