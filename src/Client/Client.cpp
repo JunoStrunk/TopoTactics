@@ -26,15 +26,14 @@ class Client
 {
 	std::string identity;
 	std::string playerTurn;
-	Piece* selectedPiece;
+	Piece *selectedPiece;
 	bool isPieceSelected;
-	
 
 public:
-	Client(){
+	Client()
+	{
 		selectedPiece = nullptr;
 		isPieceSelected = false;
-		
 	};
 
 	void initailize(sf::TcpSocket &socket)
@@ -79,84 +78,81 @@ public:
 		playerTurn = turn;
 	}
 
-	std::vector<std::pair<Vertex *, sf::Color>> setVertexColors(Piece* &p, Vertex* &v, Board &board) {
+	std::vector<std::pair<Vertex *, sf::Color>> setVertexColors(Piece *&p, Vertex *&v, Board &board)
+	{
 		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getConnection();
 		std::vector<std::pair<Vertex *, sf::Color>> changedVertices;
-		std::vector<Vertex*> connections = graph[v->getId()].second;
+		std::vector<Vertex *> connections = graph[v->getId()].second;
 		Coalition coal = p->getCoal();
 
 		// start by setting the selected vertex fill color
 		if (coal == GREEN)
 			changedVertices.push_back(std::make_pair(v, sf::Color::Green));
 
-		else if (coal == BLUE) 
+		else if (coal == BLUE)
 			changedVertices.push_back(std::make_pair(v, sf::Color::Blue));
 
 		else if (coal == PINK)
-			changedVertices.push_back(std::make_pair(v, sf::Color{ 255, 192, 203 })); // PINK
+			changedVertices.push_back(std::make_pair(v, sf::Color{255, 192, 203})); // PINK
 
 		else if (coal == ORANGE)
-			changedVertices.push_back(std::make_pair(v, sf::Color{ 255, 165, 0 })); // ORANGE
-
+			changedVertices.push_back(std::make_pair(v, sf::Color{255, 165, 0})); // ORANGE
 
 		// next, set the connection outline color, if unhappy
-		for (int i = 0; i < connections.size(); i++) 
+		for (int i = 0; i < connections.size(); i++)
 		{
-			if (coal == GREEN) 
+			if (coal == GREEN)
 			{
 				// if connected vertex is blue, make connected vertex unhappy
-				if (connections[i]->getColor() == sf::Color::Blue) 
+				if (connections[i]->getColor() == sf::Color::Blue)
 				{
 					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
 					connections[i]->setIsHappy(false);
 				}
 
 				// if connected vertex is orange, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color{ 255, 165, 0 }) // ORANGE
-				{ 
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				} 
-					
-			}
-				
-			else if (coal == BLUE) 
-			{
-				// if connection is pink, make pink unhappy
-				if (connections[i]->getColor() == sf::Color{ 255, 192, 203 }) // PINK
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				} 
-					
-				// if connection is green, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color::Green) 
+				else if (connections[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
 				{
 					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
 					v->setIsHappy(false);
 				}
-					
-			} 
-		
-			else if (coal == PINK) 
-			{
-				// if connection is orange, make orange unhappy
-				if (connections[i]->getColor() == sf::Color{ 255, 165, 0 }) // ORANGE
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				}
-					
-				// if connection is blue, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color::Blue) 
-				{
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				}
-					
 			}
 
-			else if (coal == ORANGE ) 
+			else if (coal == BLUE)
+			{
+				// if connection is pink, make pink unhappy
+				if (connections[i]->getColor() == sf::Color{255, 192, 203}) // PINK
+				{
+					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
+					connections[i]->setIsHappy(false);
+				}
+
+				// if connection is green, make selected vertex unhappy
+				else if (connections[i]->getColor() == sf::Color::Green)
+				{
+					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
+					v->setIsHappy(false);
+				}
+			}
+
+			else if (coal == PINK)
+			{
+				// if connection is orange, make orange unhappy
+				if (connections[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
+				{
+					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
+					connections[i]->setIsHappy(false);
+				}
+
+				// if connection is blue, make selected vertex unhappy
+				else if (connections[i]->getColor() == sf::Color::Blue)
+				{
+					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
+					v->setIsHappy(false);
+				}
+			}
+
+			else if (coal == ORANGE)
 			{
 				// if connection is green, make green unhappy
 				if (connections[i]->getColor() == sf::Color::Green)
@@ -164,44 +160,41 @@ public:
 					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
 					connections[i]->setIsHappy(false);
 				}
-					
+
 				// if connection is pink, make selected vertex unhappy
-				if (connections[i]->getColor() == sf::Color{ 255, 192, 203 }) 
+				if (connections[i]->getColor() == sf::Color{255, 192, 203})
 				{
 					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
 					v->setIsHappy(false);
 				}
-					
 			}
-				
 		}
 
 		return changedVertices;
-
 	}
 
-	void sendNeighborColorPacket(std::vector<std::pair<Vertex*, sf::Color>> changedVetrices, sf::TcpSocket &socket) {
+	void sendNeighborColorPacket(std::vector<std::pair<Vertex *, sf::Color>> changedVetrices, sf::TcpSocket &socket)
+	{
 		// create packet to send
 		sf::Packet packet;
 
 		packet << static_cast<sf::Uint32>(changedVetrices.size());
 
-		for (std::pair<Vertex*, sf::Color> vertex : changedVetrices) {
-			packet << vertex.first->getId(); 
+		for (std::pair<Vertex *, sf::Color> vertex : changedVetrices)
+		{
+			packet << vertex.first->getId();
 			packet << vertex.second.toInteger();
 		}
 
-		//packet << vertex->getId() << "red";
+		// packet << vertex->getId() << "red";
 
 		if (socket.send(packet) != sf::Socket::Done)
 		{
 			std::cerr << "Error: Failed to send packet to the server" << std::endl;
 			// handle error accordingly
 		}
-
-
 	}
-	
+
 	// void sendCircleColorPacket(Vertex *vertex, sf::TcpSocket &socket)
 	// {
 
@@ -226,49 +219,53 @@ public:
 	// 	}
 	// }
 
-	Piece* getSelectedPiece() {
+	Piece *getSelectedPiece()
+	{
 		return selectedPiece;
 	}
 
-	bool hasSelectedPiece() {
+	bool hasSelectedPiece()
+	{
 		return isPieceSelected;
 	}
 
-	void setHasSelectedPiece(bool selected) {
+	void setHasSelectedPiece(bool selected)
+	{
 		isPieceSelected = selected;
 	}
 
-	void setSelectedPiece(Piece* &piece) {
+	void setSelectedPiece(Piece *&piece)
+	{
 		selectedPiece = piece;
 	}
 
-	void calculateScore(Board &board) 
+	void calculateScore(Board &board)
 	{
 		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
 		int player1Score = 0;
 		int player2Score = 0;
 
-		for (auto i = graph.begin(); i != graph.end(); i++) 
+		for (auto i = graph.begin(); i != graph.end(); i++)
 		{
-			Vertex* v = i->second.first;
-			
-			if (v->getHasPiece()){
-				std::cout<< "Vertex Id:" <<v->getId() << std::endl;
-				std::cout<< "Is Happy: " <<v->getIsHappy() << std::endl;
-				std::cout<< "Player: " << v->getPlayer() << std::endl;
+			Vertex *v = i->second.first;
+
+			if (v->getHasPiece())
+			{
+				std::cout << "Vertex Id:" << v->getId() << std::endl;
+				std::cout << "Is Happy: " << v->getIsHappy() << std::endl;
+				std::cout << "Player: " << v->getPlayer() << std::endl;
 			}
-			if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 1") 
+			if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 1")
 			{
 				player1Score++;
 			}
-			else if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 2") 
+			else if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 2")
 			{
 				player2Score++;
 			}
 		}
 		std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
 	}
-
 };
 
 void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
@@ -285,93 +282,88 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 		int id;
 		sf::Uint32 color;
 		sf::Uint32 size;
-		
+
 		receivedPacket >> size;
 
-		for (sf::Uint32 i = 0; i < size; i++) 
+		for (sf::Uint32 i = 0; i < size; i++)
 		{
-			if (i == 0) 
-			{	
+			if (i == 0)
+			{
 				receivedPacket >> id;
 				receivedPacket >> color;
 				sf::Color fillColor = sf::Color(color);
 				board.getVertex(id)->setFillColor(fillColor);
 			}
 
-			else 
+			else
 			{
 				receivedPacket >> id;
 				receivedPacket >> color;
 				sf::Color outlineColor = sf::Color(color);
 				board.getVertex(id)->setOutlineColor(outlineColor);
 			}
-
 		}
 
 		std::string playerTurn;
 		receivedPacket >> playerTurn;
 		client.setPlayerTurn(playerTurn);
 
-		//calculate score
+		// calculate score
 		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
 		int player1Score = 0;
 		int player2Score = 0;
 
-		for (auto i = graph.begin(); i != graph.end(); i++) 
+		for (auto i = graph.begin(); i != graph.end(); i++)
 		{
-			Vertex* v = i->second.first;
+			Vertex *v = i->second.first;
 
-			if (client.getIdentity() == "Player 1") 
+			if (client.getIdentity() == "Player 1")
 			{
-				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red) 
+				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red)
 				{
-					if (v->getPlayer() == "Player 1") 
+					if (v->getPlayer() == "Player 1")
 						player1Score++;
-					else 
+					else
 						player2Score++;
 				}
 			}
 
-			else 
+			else
 			{
-				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red) 
+				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red)
 				{
-					if (v->getPlayer() == "Player 2") 
+					if (v->getPlayer() == "Player 2")
 						player2Score++;
-					else 
+					else
 						player1Score++;
 				}
 			}
-			
 		}
 		std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
-		
-		
 	}
 }
 
-void loadPieces(Board &board, std::vector<Piece*> &pieces, Coalition &coalition, std::string player) 
+void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
-	Piece* green = new Piece(GREEN, player);
+	Piece *green = new Piece(GREEN, player);
 	green->setPosition(250.0, 500);
 	board.addPiece(green);
 	pieces.push_back(green);
 
-	Piece* blue = new Piece(BLUE, player);
-	blue->setPosition(275.0, 500);
+	Piece *blue = new Piece(BLUE, player);
+	blue->setPosition(300.0, 500);
 	board.addPiece(blue);
 	pieces.push_back(blue);
 
-	Piece* pink = new Piece(PINK, player);
-	pink->setPosition(300.0, 500);
+	Piece *pink = new Piece(PINK, player);
+	pink->setPosition(350.0, 500);
 	board.addPiece(pink);
 	pieces.push_back(pink);
 
-	Piece* orange = new Piece(ORANGE, player);
-	orange->setPosition(325.0, 500);
+	Piece *orange = new Piece(ORANGE, player);
+	orange->setPosition(400.0, 500);
 	board.addPiece(orange);
 	pieces.push_back(orange);
-		
 }
 
 int main()
@@ -398,7 +390,7 @@ int main()
 	CardProps cardProps;
 	VertexProps vertexProps;
 	Coalition coalition;
-	std::vector<Piece*> pieces;
+	std::vector<Piece *> pieces;
 	Board board;
 	board.loadBoard("../files/board1.txt", vertexProps);
 
@@ -432,56 +424,50 @@ int main()
 			// }
 
 			// check if player's turn
-			
+
 			if (client.getIdentity() == client.getPlayerTurn())
 			{
-				
-			
+
 				// if (event.type == sf::Event::MouseButtonPressed)
 				// {
 				// 	continueButton.mousePressed(event);
 				// }
-				
 
 				if (event.type == sf::Event::MouseButtonReleased && !client.hasSelectedPiece())
 				{
-	
+
 					Piece *p = board.mouseClickPiece(event, pieces);
-					
-					if (p != nullptr) 
+
+					if (p != nullptr)
 					{
-						
+
 						client.setSelectedPiece(p);
 						client.setHasSelectedPiece(true);
 					}
-						
 				}
 
-				if (event.type == sf::Event::MouseButtonReleased && client.hasSelectedPiece()) 
+				if (event.type == sf::Event::MouseButtonReleased && client.hasSelectedPiece())
 				{
-					
+
 					Piece *p = client.getSelectedPiece();
-					 
+
 					Vertex *v = board.mouseReleased(event);
 
-
-					if (v != nullptr) 
+					if (v != nullptr)
 					{
 						v->setIsHappy(true);
 						v->setHasPiece(true);
 						v->setPlayer(client.getIdentity());
 
-						std::vector<std::pair<Vertex*, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);
+						std::vector<std::pair<Vertex *, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);
 						client.sendNeighborColorPacket(changedVetrices, socket);
-						
+
 						client.setHasSelectedPiece(false);
-						//client.calculateScore(board);
+						// client.calculateScore(board);
 						break;
 					}
-					
 				}
 
-				
 				// if (event.type == sf::Event::MouseMoved)
 				// {
 				// 	board.mouseMoved(event);
@@ -490,7 +476,6 @@ int main()
 		}
 
 		window.draw(board);
-		window.draw(continueButton);
 
 		window.display();
 	}

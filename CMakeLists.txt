@@ -5,12 +5,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Find SFML
-find_package(SFML 2.5 COMPONENTS system window graphics network REQUIRED)
-# include(FetchContent)
-# FetchContent_Declare(SFML
-#     GIT_REPOSITORY https://github.com/SFML/SFML.git
-#     GIT_TAG 2.6.x)
-# FetchContent_MakeAvailable(SFML)
+# find_package(SFML 2.5 COMPONENTS system window graphics network REQUIRED)
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
 
 # Find OpenGL package
 find_package(OpenGL REQUIRED)

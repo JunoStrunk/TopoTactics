@@ -10,8 +10,8 @@ Board::~Board()
 
 void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	for (sf::VertexArray line : edges)
-		target.draw(line);
+	for (Line line : edges)
+		line.draw(target, states);
 
 	// Printing the contents of the map
 	for (const auto &pair : graph)
@@ -135,7 +135,6 @@ void Board::setEditing(bool editing)
 
 bool Board::addVertex(Vertex *v)
 {
-
 	auto result = graph.try_emplace(v->getId());
 	if (result.second)
 		graph[v->getId()].first = v;
@@ -151,11 +150,7 @@ void Board::addConnection(Vertex *from, Vertex *to)
 	graph[to->getId()].first = to;
 	graph[to->getId()].second.push_back(from);
 
-	sf::VertexArray line(sf::Lines, 2);
-	line[0].position = sf::Vector2f(from->getX(), from->getY());
-	line[1].position = sf::Vector2f(to->getX(), to->getY());
-	line[0].color = sf::Color::Black;
-	line[1].color = sf::Color::Black;
+	Line line(from, to);
 	edges.push_back(line);
 }
 
@@ -165,6 +160,17 @@ void Board::addPiece(Piece *piece) {
 
 std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection() {
 	return graph;
+}
+
+void Board::updateEdge(int id, float x, float y)
+{
+	for (Line line : edges)
+	{
+		if (line.getFromID() == id)
+			line.setFromCoords(x, y);
+		if (line.getToID() == id)
+			line.setToCoords(x, y);
+	}
 }
 
 // Move this to shader??
@@ -179,6 +185,7 @@ void Board::mouseMoved(sf::Event &event)
 		if (pair.second.first->isDraggable())
 		{
 			pair.second.first->setCoords(event.mouseMove.x, event.mouseMove.y);
+			updateEdge(pair.first, event.mouseMove.x, event.mouseMove.y);
 		}
 	}
 }
