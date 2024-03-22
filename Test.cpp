@@ -11,7 +11,7 @@
 
 static Board board;
 
-void printMessage(std::string &msg)
+void printMessage(const std::string &msg)
 {
 	std::cout << msg << std::endl;
 }
@@ -48,7 +48,7 @@ int main()
 	// Create Button
 	Button continueButton(&(TextureManager::GetTexture("UI/continue")), &(TextureManager::GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
 	std::string continueMessage = "ContinueButtonWorks!";
-	std::function<void()> continueButtonTest = [&]()
+	std::function<void()> continueButtonTest = [&continueMessage]()
 	{ printMessage(continueMessage); };
 
 	continueButton.bindOnClick(continueButtonTest);
