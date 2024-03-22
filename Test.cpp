@@ -11,7 +11,7 @@
 
 static Board board;
 
-void printMessage(std::string msg)
+void printMessage(std::string &msg)
 {
 	std::cout << msg << std::endl;
 }
@@ -37,9 +37,8 @@ int main()
 	sf::Clock deltaClock;
 
 	// Create Texture Manager
-	TextureManager textureManager;
-	textureManager.LoadTexture("UI/continue");
-	textureManager.LoadTexture("UI/continue_clicked");
+	TextureManager::LoadTexture("UI/continue");
+	TextureManager::LoadTexture("UI/continue_clicked");
 
 	// Create Board
 	CardProps cardProps;
@@ -47,8 +46,11 @@ int main()
 	board.loadBoard("../files/board1.txt", vertexProps);
 
 	// Create Button
-	Button continueButton(&(textureManager.GetTexture("UI/continue")), &(textureManager.GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
-	std::function<void()> continueButtonTest = std::bind(printMessage, "ContinueButtonWorks!");
+	Button continueButton(&(TextureManager::GetTexture("UI/continue")), &(TextureManager::GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
+	std::string continueMessage = "ContinueButtonWorks!";
+	std::function<void()> continueButtonTest = [&]()
+	{ printMessage(continueMessage); };
+
 	continueButton.bindOnClick(continueButtonTest);
 
 	// Start the game loop

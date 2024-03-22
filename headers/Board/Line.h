@@ -12,7 +12,7 @@ private:
 
 public:
 	Line(Vertex *from, Vertex *to);
-	~Line(){};
+	~Line() = default;
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 	int getFromID() const;

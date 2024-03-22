@@ -16,7 +16,7 @@ private:
 
 public:
 	Piece(Coalition coal, std::string player);
-	~Piece(){};
+	~Piece() = default;
 
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
@@ -28,5 +28,4 @@ public:
 	// Setters
 	void setPosition(float x, float y);
 	void setSelected(bool selected);
-	
 };

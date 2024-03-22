@@ -13,16 +13,13 @@
 class Board : public sf::Drawable
 {
 private:
-	bool editing;
+	bool editing = false;
 	std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph; // Key: , Value pair<from, to vector>
 	std::vector<Piece *> pieces;
 	std::vector<Line> edges;
 
 public:
-	Board()
-	{
-		editing = false;
-	};
+	Board() = default;
 	~Board();
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 	void loadBoard(const char *boardPath, VertexProps &vertexProps);
