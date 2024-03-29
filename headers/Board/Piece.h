@@ -6,9 +6,12 @@
 class Piece : public sf::Drawable
 {
 private:
+	// Piece offset 106px 84px
 	bool isHappy; // default true
 	Coalition coal;
-	sf::Sprite sprite;
+	sf::Sprite *currSprite;
+	sf::Sprite happySprite;
+	sf::Sprite sadSprite;
 	sf::Texture texture;
 	bool selected;
 	float xpos;

@@ -346,22 +346,22 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
 	Piece *green = new Piece(GREEN, player);
-	green->setPosition(250.0, 500);
+	green->setPosition(50.0, 350);
 	board.addPiece(green);
 	pieces.push_back(green);
 
 	Piece *blue = new Piece(BLUE, player);
-	blue->setPosition(300.0, 500);
+	blue->setPosition(200.0, 350);
 	board.addPiece(blue);
 	pieces.push_back(blue);
 
 	Piece *pink = new Piece(PINK, player);
-	pink->setPosition(350.0, 500);
+	pink->setPosition(400.0, 350);
 	board.addPiece(pink);
 	pieces.push_back(pink);
 
 	Piece *orange = new Piece(ORANGE, player);
-	orange->setPosition(400.0, 500);
+	orange->setPosition(570.0, 350);
 	board.addPiece(orange);
 	pieces.push_back(orange);
 }
