@@ -1,148 +1,98 @@
 #include "Piece.h"
 
-Piece::Piece(Coalition coal, std::string player)
+Piece::Piece(Coalition coal, std::string player, sf::Texture &hapTex1, sf::Texture &sadTex1, sf::Texture &hapTex2, sf::Texture &sadTex2)
 {
-	isHappy = true;
 	this->coal = coal;
+	placed = false;
 	selected = false;
-
 	if (player == "Player 1")
 	{
-		if (coal == GREEN) // 292 333
+		if (coal == GREEN)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(0, 0, 292, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(0, 333, 292, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 296;
+			this->height = 340;
 		}
-		else if (coal == BLUE) // 424 333
+		else if (coal == BLUE)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(292, 0, 424, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(292, 333, 424, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 430;
+			this->height = 278;
 		}
-		else if (coal == PINK) // 322 333
+		else if (coal == PINK)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(716, 0, 322, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(716, 333, 322, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 330;
+			this->height = 268;
 		}
-		else if (coal == ORANGE) // 242 333
+		else if (coal == ORANGE)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(1038, 0, 242, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(1038, 333, 242, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 250;
+			this->height = 295;
 		}
-		(*currSprite).setScale(.5f, .5f);
+		this->hapTex = hapTex1;
+		this->sadTex = sadTex1;
 	}
 	else
 	{
-		if (coal == GREEN) // 292 333
+		if (coal == GREEN)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(0, 666, 292, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(0, 999, 292, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 296;
+			this->height = 340;
 		}
-		else if (coal == BLUE) // 424 333
+		else if (coal == BLUE)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(292, 666, 424, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(292, 999, 424, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 430;
+			this->height = 278;
 		}
-		else if (coal == PINK) // 322 333
+		else if (coal == PINK)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(716, 666, 322, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(716, 999, 322, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 330;
+			this->height = 268;
 		}
-		else if (coal == ORANGE) // 242 333
+		else if (coal == ORANGE)
 		{
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(1038, 666, 242, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			happySprite.setTexture(texture);
-			if (!texture.loadFromFile("../assets/Pieces.png", sf::IntRect(1038, 999, 242, 333)))
-			{
-				// Handle error if texture loading fails
-			}
-			sadSprite.setTexture(texture);
-			currSprite = &happySprite;
+			this->width = 250;
+			this->height = 295;
 		}
-		(*currSprite).setScale(.5f, .5f);
+		this->hapTex = hapTex2;
+		this->sadTex = sadTex2;
 	}
+	currSprite.setTexture(this->hapTex);
+	currSprite.setScale(scale, scale);
 }
+
+// Piece &Piece::operator=(const Piece &p)
+// {
+// }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	target.draw((*currSprite), states);
+	target.draw(currSprite, states);
 }
 
 /*======= Getters =============================*/
 
+float Piece::getWidth()
+{
+	return width;
+}
+
+float Piece::getHeight()
+{
+	return height;
+}
+
+float Piece::getScale()
+{
+	return scale;
+}
+
 sf::FloatRect Piece::getGlobalBounds() const
 {
-	return (*currSprite).getGlobalBounds();
+	return currSprite.getGlobalBounds();
 }
 
 sf::Sprite Piece::getSprite()
 {
-	return *currSprite;
+	return currSprite;
 }
 
 Coalition Piece::getCoal()
@@ -153,9 +103,17 @@ Coalition Piece::getCoal()
 /*======= Setters =============================*/
 void Piece::setPosition(float x, float y)
 {
-	(*currSprite).setPosition(sf::Vector2f(x, y));
+	currSprite.setPosition(sf::Vector2f(x, y));
 }
 void Piece::setSelected(bool selected)
 {
 	this->selected = selected;
+}
+
+void Piece::setTex(bool isHappy)
+{
+	if (isHappy)
+		currSprite.setTexture(hapTex);
+	else
+		currSprite.setTexture(sadTex);
 }

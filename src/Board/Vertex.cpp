@@ -3,7 +3,6 @@
 Vertex::Vertex(int id, float x, float y, VertexProps *props)
 {
 	this->id = id;
-	piece = nullptr;
 	xpos = x;
 	ypos = y;
 	shape.setPosition(xpos, ypos);
@@ -17,11 +16,19 @@ Vertex::Vertex(int id, float x, float y, VertexProps *props)
 	selected = false;
 	draggable = false;
 	hasPiece = false;
+	isHappy = true;
 }
 
 void Vertex::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	target.draw(shape, states);
+	if (hasPiece)
+	{
+		target.draw(piece, states);
+	}
+	else
+	{
+		target.draw(shape, states);
+	}
 }
 
 /*======= Getters =============================*/
@@ -55,7 +62,7 @@ sf::Color Vertex::getColor()
 	return shape.getFillColor();
 }
 
-sf::Color Vertex::getOutlineColor() 
+sf::Color Vertex::getOutlineColor()
 {
 	return shape.getOutlineColor();
 }
@@ -75,17 +82,24 @@ bool Vertex::isDraggable() const
 	return draggable;
 }
 
-std::string Vertex::getPlayer() 
+std::string Vertex::getPlayer()
 {
 	return playerIdentity;
 }
-bool Vertex::getIsHappy() 
+bool Vertex::getIsHappy()
 {
 	return isHappy;
 }
-bool Vertex::getHasPiece() 
+bool Vertex::getHasPiece()
 {
 	return hasPiece;
+}
+
+Coalition Vertex::getCoal()
+{
+	if (!hasPiece)
+		return;
+	return piece.getCoal();
 }
 
 /*======= Setters =============================*/
@@ -133,18 +147,28 @@ void Vertex::setCoords(float x, float y)
 	xpos = x;
 	ypos = y;
 	shape.setPosition(xpos, ypos);
-} 
-
-void Vertex::setIsHappy(bool happy) 
-{
-	isHappy = happy;
 }
 
-void Vertex::setHasPiece(bool hasPiece) 
+void Vertex::setIsHappy(bool happy)
+{
+	isHappy = happy;
+	if (hasPiece)
+		piece.setTex(isHappy);
+}
+
+void Vertex::setHasPiece(bool hasPiece)
 {
 	this->hasPiece = hasPiece;
 }
-void Vertex::setPlayer(std::string identity) 
+void Vertex::setPlayer(std::string identity)
 {
 	playerIdentity = identity;
+}
+
+void Vertex::setPiece(Piece piece)
+{
+	this->piece = piece;
+	this->piece.setPosition(xpos - piece.getSprite().getGlobalBounds().width / 2.0, ypos - piece.getSprite().getGlobalBounds().height / 2.0);
+	piece.setTex(isHappy);
+	hasPiece = true;
 }

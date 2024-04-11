@@ -6,6 +6,7 @@
 #include "Card.h"
 #include "Piece.h"
 #include "TextureManager.h"
+#include "HrzLayoutGrp.h"
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -13,9 +14,6 @@
 const sf::IpAddress IP = "";
 // const sf::IpAddress IP = sf::IpAddress::getLocalAddress();
 const int PORT = 2222;
-
-/*======= Serialization ========================*/
-sf::Packet &operator<<(sf::Packet &packet, const Vertex &m);
 
 void printMessage(std::string msg)
 {
@@ -195,30 +193,6 @@ public:
 		}
 	}
 
-	// void sendCircleColorPacket(Vertex *vertex, sf::TcpSocket &socket)
-	// {
-
-	// 	// create packet to send
-	// 	sf::Packet packet;
-
-	// 	if (vertex->getColor() == sf::Color::Blue)
-	// 	{
-	// 		std::cout << "Sending: " << vertex->getId() << "\n";
-	// 		packet << vertex->getId() << "green";
-	// 	}
-	// 	else
-	// 	{
-	// 		packet << vertex->getId() << "blue";
-	// 	}
-
-	// 	// send packet to server
-	// 	if (socket.send(packet) != sf::Socket::Done)
-	// 	{
-	// 		std::cerr << "Error: Failed to send packet to the server" << std::endl;
-	// 		// handle error accordingly
-	// 	}
-	// }
-
 	Piece *getSelectedPiece()
 	{
 		return selectedPiece;
@@ -294,13 +268,16 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 				sf::Color fillColor = sf::Color(color);
 				board.getVertex(id)->setFillColor(fillColor);
 			}
-
 			else
 			{
 				receivedPacket >> id;
 				receivedPacket >> color;
 				sf::Color outlineColor = sf::Color(color);
 				board.getVertex(id)->setOutlineColor(outlineColor);
+				// if (outlineColor == sf::Color::Red)
+				// 	board.getVertex(id)->setIsHappy(false);
+				// else
+				// 	board.getVertex(id)->setIsHappy(true);
 			}
 		}
 
@@ -345,25 +322,32 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
-	Piece *green = new Piece(GREEN, player);
-	green->setPosition(50.0, 350);
+	HrzLayoutGrp pieceGroup(50, 350, 2);
+	Piece *green = new Piece(GREEN, player, TextureManager::GetTexture("Dad1Happy"), TextureManager::GetTexture("Dad1Sad"), TextureManager::GetTexture("Dad2Happy"), TextureManager::GetTexture("Dad2Sad"));
+	// green->setPosition(50.0, 350);
+	pieceGroup.Add(green);
 	board.addPiece(green);
 	pieces.push_back(green);
 
-	Piece *blue = new Piece(BLUE, player);
-	blue->setPosition(200.0, 350);
+	Piece *blue = new Piece(BLUE, player, TextureManager::GetTexture("Mom1Happy"), TextureManager::GetTexture("Mom1Sad"), TextureManager::GetTexture("Mom2Happy"), TextureManager::GetTexture("Mom2Sad"));
+	// blue->setPosition(200.0, 350);
+	pieceGroup.Add(blue);
 	board.addPiece(blue);
 	pieces.push_back(blue);
 
-	Piece *pink = new Piece(PINK, player);
-	pink->setPosition(400.0, 350);
+	Piece *pink = new Piece(PINK, player, TextureManager::GetTexture("MH1Happy"), TextureManager::GetTexture("MH1Sad"), TextureManager::GetTexture("MH2Happy"), TextureManager::GetTexture("MH2Sad"));
+	// pink->setPosition(400.0, 350);
+	pieceGroup.Add(pink);
 	board.addPiece(pink);
 	pieces.push_back(pink);
 
-	Piece *orange = new Piece(ORANGE, player);
-	orange->setPosition(570.0, 350);
+	Piece *orange = new Piece(ORANGE, player, TextureManager::GetTexture("Bro1Happy"), TextureManager::GetTexture("Bro1Sad"), TextureManager::GetTexture("Bro2Happy"), TextureManager::GetTexture("Bro2Sad"));
+	// orange->setPosition(570.0, 350);
+	pieceGroup.Add(orange);
 	board.addPiece(orange);
 	pieces.push_back(orange);
+
+	pieceGroup.calculate();
 }
 
 int main()
@@ -382,9 +366,22 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
 
 	// Create Texture Manager
-	TextureManager textureManager;
-	textureManager.LoadTexture("UI/continue");
-	textureManager.LoadTexture("UI/continue_clicked");
+	TextureManager::LoadTexture("Dad1Sad", "Characters", sf::IntRect(0, 0, 296, 340));
+	TextureManager::LoadTexture("Dad1Happy", "Characters", sf::IntRect(0, 440, 296, 340));
+	TextureManager::LoadTexture("Mom1Sad", "Characters", sf::IntRect(440, 0, 430, 278));
+	TextureManager::LoadTexture("Mom1Happy", "Characters", sf::IntRect(440, 440, 430, 278));
+	TextureManager::LoadTexture("MH1Sad", "Characters", sf::IntRect(880, 0, 330, 268));
+	TextureManager::LoadTexture("MH1Happy", "Characters", sf::IntRect(880, 440, 330, 268));
+	TextureManager::LoadTexture("Bro1Sad", "Characters", sf::IntRect(1320, 0, 250, 295));
+	TextureManager::LoadTexture("Bro1Happy", "Characters", sf::IntRect(1320, 440, 250, 295));
+	TextureManager::LoadTexture("Dad2Sad", "Characters", sf::IntRect(0, 880, 296, 340));
+	TextureManager::LoadTexture("Dad2Happy", "Characters", sf::IntRect(0, 1320, 296, 340));
+	TextureManager::LoadTexture("Mom2Sad", "Characters", sf::IntRect(440, 880, 430, 278));
+	TextureManager::LoadTexture("Mom2Happy", "Characters", sf::IntRect(440, 1320, 430, 278));
+	TextureManager::LoadTexture("MH2Sad", "Characters", sf::IntRect(880, 880, 330, 268));
+	TextureManager::LoadTexture("MH2Happy", "Characters", sf::IntRect(880, 1320, 330, 268));
+	TextureManager::LoadTexture("Bro2Sad", "Characters", sf::IntRect(1320, 880, 250, 295));
+	TextureManager::LoadTexture("Bro2Happy", "Characters", sf::IntRect(1320, 1320, 250, 295));
 
 	// Create Board
 	CardProps cardProps;
@@ -395,7 +392,7 @@ int main()
 	board.loadBoard("../files/board1.txt", vertexProps);
 
 	// Create Button
-	Button continueButton(&(textureManager.GetTexture("UI/continue")), &(textureManager.GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
+	Button continueButton(&(TextureManager::GetTexture("continue")), &(TextureManager::GetTexture("continue_clicked")), sf::Vector2f(600.0f, 200.0f));
 	std::function<void()> continueButtonTest = std::bind(printMessage, "ContinueButtonWorks!");
 	continueButton.bindOnClick(continueButtonTest);
 
@@ -455,8 +452,9 @@ int main()
 
 					if (v != nullptr)
 					{
-						v->setIsHappy(true);
+						v->setPiece(*p);
 						v->setHasPiece(true);
+						v->setIsHappy(true);
 						v->setPlayer(client.getIdentity());
 
 						std::vector<std::pair<Vertex *, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);

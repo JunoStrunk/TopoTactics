@@ -80,7 +80,11 @@
 			"random": "cpp",
 			"type_traits": "cpp",
 			"utility": "cpp",
-			"cinttypes": "cpp"
+			"cinttypes": "cpp",
+			"codecvt": "cpp",
+			"fstream": "cpp",
+			"iomanip": "cpp",
+			"semaphore": "cpp"
 		}
 	}
 }

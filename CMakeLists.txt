@@ -35,13 +35,14 @@ file(GLOB_RECURSE CLIENTSRC
 "${CMAKE_SOURCE_DIR}/src/Board/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/UI/*.cpp"
+"${CMAKE_SOURCE_DIR}/src/TextureManager.cpp"
 "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
 
 file(GLOB_RECURSE TESTSRC
 "${CMAKE_SOURCE_DIR}/src/Board/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/UI/*.cpp"
-"${CMAKE_SOURCE_DIR}/src/Client/TextureManager.cpp"
+"${CMAKE_SOURCE_DIR}/src/TextureManager.cpp"
 "${CMAKE_SOURCE_DIR}/Test.cpp")
 
 # text file directory

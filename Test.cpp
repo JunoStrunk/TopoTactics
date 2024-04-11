@@ -35,10 +35,7 @@ int main()
 	if (!(ImGui::SFML::Init(window)))
 		return -1;
 	sf::Clock deltaClock;
-
-	// Create Texture Manager
-	TextureManager::LoadTexture("UI/continue");
-	TextureManager::LoadTexture("UI/continue_clicked");
+	TextureManager texManager;
 
 	// Create Board
 	CardProps cardProps;
@@ -46,7 +43,7 @@ int main()
 	board.loadBoard("../files/board1.txt", vertexProps);
 
 	// Create Button
-	Button continueButton(&(TextureManager::GetTexture("UI/continue")), &(TextureManager::GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
+	Button continueButton(&(texManager.GetTexture("UI/continue")), &(texManager.GetTexture("UI/continue_clicked")), sf::Vector2f(600.0f, 200.0f));
 	std::string continueMessage = "ContinueButtonWorks!";
 	std::function<void()> continueButtonTest = [&continueMessage]()
 	{ printMessage(continueMessage); };

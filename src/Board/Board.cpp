@@ -16,10 +16,11 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	// Printing the contents of the map
 	for (const auto &pair : graph)
 	{
-		target.draw(pair.second.first->getShape());
+		target.draw(*(pair.second.first));
 	}
 
-	for (Piece* piece : pieces) {
+	for (Piece *piece : pieces)
+	{
 		target.draw(piece->getSprite());
 	}
 }
@@ -106,6 +107,24 @@ void Board::loadBoard(const char *boardPath, VertexProps &vertexProps)
 	}
 }
 
+std::vector<std::pair<Vertex *, sf::Color>> Board::updateBoard(int changeKey)
+{
+	std::vector<std::pair<Vertex *, sf::Color>> changedVertices;
+	Vertex *v = getVertex(changeKey);
+
+	// start by setting the selected vertex fill color
+	if (v->getCoal() == GREEN)
+		changedVertices.push_back(std::make_pair(v, sf::Color::Green));
+	else if (v->getCoal() == BLUE)
+		changedVertices.push_back(std::make_pair(v, sf::Color::Blue));
+	else if (v->getCoal() == PINK)
+		changedVertices.push_back(std::make_pair(v, sf::Color{255, 192, 203})); // PINK
+	else if (v->getCoal() == ORANGE)
+		changedVertices.push_back(std::make_pair(v, sf::Color{255, 165, 0})); // ORANGE
+
+	return changedVertices;
+}
+
 Vertex *Board::getVertex(int key)
 {
 	return graph.at(key).first;
@@ -154,11 +173,13 @@ void Board::addConnection(Vertex *from, Vertex *to)
 	edges.push_back(line);
 }
 
-void Board::addPiece(Piece *piece) {
+void Board::addPiece(Piece *piece)
+{
 	pieces.push_back(piece);
 }
 
-std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection() {
+std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection()
+{
 	return graph;
 }
 
@@ -222,25 +243,25 @@ void Board::mousePressed(sf::Event &event)
 	}
 }
 
-Piece *Board::mouseClickPiece(sf::Event &event, std::vector<Piece*> &pieces) 
+Piece *Board::mouseClickPiece(sf::Event &event, std::vector<Piece *> &pieces)
 {
 	Piece *selected = nullptr;
-	for (Piece *piece : pieces) 
+	for (Piece *piece : pieces)
 	{
-		
-		if (piece->getSprite().getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) 
+
+		if (piece->getSprite().getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
 		{
-			
+
 			piece->setSelected(true);
 			selected = piece;
 			break;
 		}
-		
-		//if (piece->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) 
+
+		// if (piece->getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
 		//{
 		//	piece->setSelected(true);
 		//	selected = piece;
-		//}
+		// }
 	}
 	return selected;
 }

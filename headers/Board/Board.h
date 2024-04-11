@@ -23,6 +23,8 @@ public:
 	~Board();
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 	void loadBoard(const char *boardPath, VertexProps &vertexProps);
+	std::vector<std::pair<Vertex *, sf::Color>> updateBoard(int changeKey);
+	void updateNeighbors();
 
 	// Getters
 	Vertex *getVertex(int key);
