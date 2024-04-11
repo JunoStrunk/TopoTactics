@@ -19,10 +19,8 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 		target.draw(*(pair.second.first));
 	}
 
-	for (Piece *piece : pieces)
-	{
-		target.draw(piece->getSprite());
-	}
+	for (Piece *p : drawPieces)
+		target.draw(*p);
 }
 
 void Board::loadBoard(const char *boardPath, VertexProps &vertexProps)
@@ -107,6 +105,24 @@ void Board::loadBoard(const char *boardPath, VertexProps &vertexProps)
 	}
 }
 
+// This function parse's opponent's move and places the correct sprite where it needs to go
+void Board::recieveUpdate(int changeKey, sf::Color fillColor, std::string identity)
+{
+
+	Piece *p = nullptr;
+	if (fillColor == sf::Color::Green)
+		p = (identity == "Player 1") ? pieces[4] : pieces[0];
+	else if (fillColor == sf::Color::Blue)
+		p = (identity == "Player 1") ? pieces[5] : pieces[1];
+	else if (fillColor == sf::Color{255, 192, 203}) // PINK
+		p = (identity == "Player 1") ? pieces[6] : pieces[2];
+	else if (fillColor == sf::Color{255, 165, 0}) // ORANGE
+		p = (identity == "Player 1") ? pieces[7] : pieces[3];
+
+	if (p != nullptr)
+		getVertex(changeKey)->setPiece(*p);
+}
+
 std::vector<std::pair<Vertex *, sf::Color>> Board::updateBoard(int changeKey)
 {
 	std::vector<std::pair<Vertex *, sf::Color>> changedVertices;
@@ -122,12 +138,97 @@ std::vector<std::pair<Vertex *, sf::Color>> Board::updateBoard(int changeKey)
 	else if (v->getCoal() == ORANGE)
 		changedVertices.push_back(std::make_pair(v, sf::Color{255, 165, 0})); // ORANGE
 
+	updateNeighbors(changeKey, &changedVertices);
+
 	return changedVertices;
 }
 
+void Board::updateNeighbors(int changeKey, std::vector<std::pair<Vertex *, sf::Color>> *changedVertices)
+{
+	Vertex *v = getVertex(changeKey);
+	std::vector<Vertex *> *neighbors = getNeighbors(changeKey);
+	for (int i = 0; i < getNeighbors(changeKey)->size(); i++)
+	{
+		if (v->getCoal() == GREEN)
+		{
+			// if connected vertex is blue, make connected vertex unhappy
+			if ((*neighbors)[i]->getColor() == sf::Color::Blue)
+			{
+				changedVertices->push_back(std::make_pair((*neighbors)[i], sf::Color::Red));
+				(*neighbors)[i]->setIsHappy(false);
+			}
+			// if connected vertex is orange, make selected vertex unhappy
+			else if ((*neighbors)[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
+			{
+				changedVertices->push_back(std::make_pair(v, sf::Color::Red));
+				v->setIsHappy(false);
+			}
+		}
+
+		else if (v->getCoal() == BLUE)
+		{
+			// if connection is pink, make pink unhappy
+			if ((*neighbors)[i]->getColor() == sf::Color{255, 192, 203}) // PINK
+			{
+				changedVertices->push_back(std::make_pair((*neighbors)[i], sf::Color::Red));
+				(*neighbors)[i]->setIsHappy(false);
+			}
+			// if connection is green, make selected vertex unhappy
+			else if ((*neighbors)[i]->getColor() == sf::Color::Green)
+			{
+				changedVertices->push_back(std::make_pair(v, sf::Color::Red));
+				v->setIsHappy(false);
+			}
+		}
+		else if (v->getCoal() == PINK)
+		{
+			// if connection is orange, make orange unhappy
+			if ((*neighbors)[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
+			{
+				changedVertices->push_back(std::make_pair((*neighbors)[i], sf::Color::Red));
+				(*neighbors)[i]->setIsHappy(false);
+			}
+
+			// if connection is blue, make selected vertex unhappy
+			else if ((*neighbors)[i]->getColor() == sf::Color::Blue)
+			{
+				changedVertices->push_back(std::make_pair(v, sf::Color::Red));
+				v->setIsHappy(false);
+			}
+		}
+		else if (v->getCoal() == ORANGE)
+		{
+			// if connection is green, make green unhappy
+			if ((*neighbors)[i]->getColor() == sf::Color::Green)
+			{
+				changedVertices->push_back(std::make_pair((*neighbors)[i], sf::Color::Red));
+				(*neighbors)[i]->setIsHappy(false);
+			}
+
+			// if connection is pink, make selected vertex unhappy
+			if ((*neighbors)[i]->getColor() == sf::Color{255, 192, 203})
+			{
+				changedVertices->push_back(std::make_pair(v, sf::Color::Red));
+				v->setIsHappy(false);
+			}
+		}
+	}
+}
+
+// GETTERS ================================================================================================================
 Vertex *Board::getVertex(int key)
 {
 	return graph.at(key).first;
+}
+
+std::vector<Vertex *> *Board::getNeighbors(int key)
+{
+	return &(graph.at(key).second);
+}
+
+Vertex *Board::getNeighborAt(int key, int nkey)
+{
+	return graph.at(key).second[nkey];
 }
 
 bool *Board::getEditing()
@@ -142,14 +243,20 @@ void Board::printIds()
 		std::cout << "Key: " << pair.first << " Vertex ID: " << pair.second.first->getId() << "\n";
 	}
 }
-std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getVertexGraph()
+std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getVertexGraph()
 {
 	return graph;
 }
 
+// SETTERS ================================================================================================================
 void Board::setEditing(bool editing)
 {
 	this->editing = editing;
+}
+
+void Board::setHrzLayoutGrp(HrzLayoutGrp ps)
+{
+	drawPieces = ps.getItems();
 }
 
 bool Board::addVertex(Vertex *v)
@@ -178,7 +285,7 @@ void Board::addPiece(Piece *piece)
 	pieces.push_back(piece);
 }
 
-std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection()
+std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> Board::getConnection()
 {
 	return graph;
 }

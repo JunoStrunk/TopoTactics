@@ -3,7 +3,7 @@
 #include "Piece.h"
 #pragma once
 
-class HrzLayoutGrp
+class HrzLayoutGrp : public sf::Drawable
 {
 private:
 	std::vector<Piece *> items;
@@ -13,6 +13,8 @@ private:
 
 public:
 	HrzLayoutGrp(float xpos, float ypos, float padding);
+	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 	void Add(Piece *piece);
 	void calculate();
+	std::vector<Piece *> getItems();
 };

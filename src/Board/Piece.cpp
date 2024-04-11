@@ -1,67 +1,35 @@
 #include "Piece.h"
 
-Piece::Piece(Coalition coal, std::string player, sf::Texture &hapTex1, sf::Texture &sadTex1, sf::Texture &hapTex2, sf::Texture &sadTex2)
+Piece::Piece(Coalition coal, std::string player, sf::Texture &hapTex, sf::Texture &sadTex)
 {
 	this->coal = coal;
-	placed = false;
 	selected = false;
-	if (player == "Player 1")
+	identity = player;
+	if (coal == GREEN)
 	{
-		if (coal == GREEN)
-		{
-			this->width = 296;
-			this->height = 340;
-		}
-		else if (coal == BLUE)
-		{
-			this->width = 430;
-			this->height = 278;
-		}
-		else if (coal == PINK)
-		{
-			this->width = 330;
-			this->height = 268;
-		}
-		else if (coal == ORANGE)
-		{
-			this->width = 250;
-			this->height = 295;
-		}
-		this->hapTex = hapTex1;
-		this->sadTex = sadTex1;
+		this->width = 296;
+		this->height = 340;
 	}
-	else
+	else if (coal == BLUE)
 	{
-		if (coal == GREEN)
-		{
-			this->width = 296;
-			this->height = 340;
-		}
-		else if (coal == BLUE)
-		{
-			this->width = 430;
-			this->height = 278;
-		}
-		else if (coal == PINK)
-		{
-			this->width = 330;
-			this->height = 268;
-		}
-		else if (coal == ORANGE)
-		{
-			this->width = 250;
-			this->height = 295;
-		}
-		this->hapTex = hapTex2;
-		this->sadTex = sadTex2;
+		this->width = 430;
+		this->height = 278;
 	}
+	else if (coal == PINK)
+	{
+		this->width = 330;
+		this->height = 268;
+	}
+	else if (coal == ORANGE)
+	{
+		this->width = 250;
+		this->height = 295;
+	}
+	this->hapTex = hapTex;
+	this->sadTex = sadTex;
 	currSprite.setTexture(this->hapTex);
 	currSprite.setScale(scale, scale);
 }
-
-// Piece &Piece::operator=(const Piece &p)
-// {
-// }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {

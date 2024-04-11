@@ -9,10 +9,15 @@ class Piece : public sf::Drawable
 private:
 	Coalition coal;
 	sf::Sprite currSprite;
+
+	// Textures
 	sf::Texture hapTex;
 	sf::Texture sadTex;
-	bool placed;
+
 	bool selected;
+	std::string identity;
+
+	// Transformation
 	float xpos;
 	float ypos;
 	float width;
@@ -20,7 +25,7 @@ private:
 	float scale = 0.3;
 
 public:
-	Piece(Coalition coal, std::string player, sf::Texture &hapTex1, sf::Texture &sadTex1, sf::Texture &hapTex2, sf::Texture &sadTex2);
+	Piece(Coalition coal, std::string player, sf::Texture &hapTex, sf::Texture &sadTex);
 	Piece() = default;
 	// Piece &operator=(const Piece &p);
 
@@ -38,4 +43,5 @@ public:
 	void setPosition(float x, float y);
 	void setSelected(bool selected);
 	void setTex(bool isHappy);
+	void switchSides();
 };

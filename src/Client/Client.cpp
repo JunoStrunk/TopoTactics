@@ -76,101 +76,6 @@ public:
 		playerTurn = turn;
 	}
 
-	std::vector<std::pair<Vertex *, sf::Color>> setVertexColors(Piece *&p, Vertex *&v, Board &board)
-	{
-		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getConnection();
-		std::vector<std::pair<Vertex *, sf::Color>> changedVertices;
-		std::vector<Vertex *> connections = graph[v->getId()].second;
-		Coalition coal = p->getCoal();
-
-		// start by setting the selected vertex fill color
-		if (coal == GREEN)
-			changedVertices.push_back(std::make_pair(v, sf::Color::Green));
-
-		else if (coal == BLUE)
-			changedVertices.push_back(std::make_pair(v, sf::Color::Blue));
-
-		else if (coal == PINK)
-			changedVertices.push_back(std::make_pair(v, sf::Color{255, 192, 203})); // PINK
-
-		else if (coal == ORANGE)
-			changedVertices.push_back(std::make_pair(v, sf::Color{255, 165, 0})); // ORANGE
-
-		// next, set the connection outline color, if unhappy
-		for (int i = 0; i < connections.size(); i++)
-		{
-			if (coal == GREEN)
-			{
-				// if connected vertex is blue, make connected vertex unhappy
-				if (connections[i]->getColor() == sf::Color::Blue)
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				}
-
-				// if connected vertex is orange, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
-				{
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				}
-			}
-
-			else if (coal == BLUE)
-			{
-				// if connection is pink, make pink unhappy
-				if (connections[i]->getColor() == sf::Color{255, 192, 203}) // PINK
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				}
-
-				// if connection is green, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color::Green)
-				{
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				}
-			}
-
-			else if (coal == PINK)
-			{
-				// if connection is orange, make orange unhappy
-				if (connections[i]->getColor() == sf::Color{255, 165, 0}) // ORANGE
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				}
-
-				// if connection is blue, make selected vertex unhappy
-				else if (connections[i]->getColor() == sf::Color::Blue)
-				{
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				}
-			}
-
-			else if (coal == ORANGE)
-			{
-				// if connection is green, make green unhappy
-				if (connections[i]->getColor() == sf::Color::Green)
-				{
-					changedVertices.push_back(std::make_pair(connections[i], sf::Color::Red));
-					connections[i]->setIsHappy(false);
-				}
-
-				// if connection is pink, make selected vertex unhappy
-				if (connections[i]->getColor() == sf::Color{255, 192, 203})
-				{
-					changedVertices.push_back(std::make_pair(v, sf::Color::Red));
-					v->setIsHappy(false);
-				}
-			}
-		}
-
-		return changedVertices;
-	}
-
 	void sendNeighborColorPacket(std::vector<std::pair<Vertex *, sf::Color>> changedVetrices, sf::TcpSocket &socket)
 	{
 		// create packet to send
@@ -213,33 +118,34 @@ public:
 		selectedPiece = piece;
 	}
 
-	void calculateScore(Board &board)
-	{
-		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
-		int player1Score = 0;
-		int player2Score = 0;
+	// Duplicate Code, Reappears in recieveMessages below
+	// void calculateScore(Board &board)
+	// {
+	// 	std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
+	// 	int player1Score = 0;
+	// 	int player2Score = 0;
 
-		for (auto i = graph.begin(); i != graph.end(); i++)
-		{
-			Vertex *v = i->second.first;
+	// 	for (auto i = graph.begin(); i != graph.end(); i++)
+	// 	{
+	// 		Vertex *v = i->second.first;
 
-			if (v->getHasPiece())
-			{
-				std::cout << "Vertex Id:" << v->getId() << std::endl;
-				std::cout << "Is Happy: " << v->getIsHappy() << std::endl;
-				std::cout << "Player: " << v->getPlayer() << std::endl;
-			}
-			if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 1")
-			{
-				player1Score++;
-			}
-			else if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 2")
-			{
-				player2Score++;
-			}
-		}
-		std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
-	}
+	// 		if (v->getHasPiece())
+	// 		{
+	// 			std::cout << "Vertex Id:" << v->getId() << std::endl;
+	// 			std::cout << "Is Happy: " << v->getIsHappy() << std::endl;
+	// 			std::cout << "Player: " << v->getPlayer() << std::endl;
+	// 		}
+	// 		if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 1")
+	// 		{
+	// 			player1Score++;
+	// 		}
+	// 		else if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 2")
+	// 		{
+	// 			player2Score++;
+	// 		}
+	// 	}
+	// 	std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
+	// }
 };
 
 void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
@@ -267,6 +173,8 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 				receivedPacket >> color;
 				sf::Color fillColor = sf::Color(color);
 				board.getVertex(id)->setFillColor(fillColor);
+				if (board.getVertex(id)->getPlayer() != client.getIdentity())
+					board.recieveUpdate(id, fillColor, client.getIdentity());
 			}
 			else
 			{
@@ -274,10 +182,10 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 				receivedPacket >> color;
 				sf::Color outlineColor = sf::Color(color);
 				board.getVertex(id)->setOutlineColor(outlineColor);
-				// if (outlineColor == sf::Color::Red)
-				// 	board.getVertex(id)->setIsHappy(false);
-				// else
-				// 	board.getVertex(id)->setIsHappy(true);
+				if (outlineColor == sf::Color::Red)
+					board.getVertex(id)->setIsHappy(false);
+				else
+					board.getVertex(id)->setIsHappy(true);
 			}
 		}
 
@@ -286,7 +194,7 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 		client.setPlayerTurn(playerTurn);
 
 		// calculate score
-		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
+		std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
 		int player1Score = 0;
 		int player2Score = 0;
 
@@ -322,50 +230,7 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
-	HrzLayoutGrp pieceGroup(50, 350, 2);
-	Piece *green = new Piece(GREEN, player, TextureManager::GetTexture("Dad1Happy"), TextureManager::GetTexture("Dad1Sad"), TextureManager::GetTexture("Dad2Happy"), TextureManager::GetTexture("Dad2Sad"));
-	// green->setPosition(50.0, 350);
-	pieceGroup.Add(green);
-	board.addPiece(green);
-	pieces.push_back(green);
-
-	Piece *blue = new Piece(BLUE, player, TextureManager::GetTexture("Mom1Happy"), TextureManager::GetTexture("Mom1Sad"), TextureManager::GetTexture("Mom2Happy"), TextureManager::GetTexture("Mom2Sad"));
-	// blue->setPosition(200.0, 350);
-	pieceGroup.Add(blue);
-	board.addPiece(blue);
-	pieces.push_back(blue);
-
-	Piece *pink = new Piece(PINK, player, TextureManager::GetTexture("MH1Happy"), TextureManager::GetTexture("MH1Sad"), TextureManager::GetTexture("MH2Happy"), TextureManager::GetTexture("MH2Sad"));
-	// pink->setPosition(400.0, 350);
-	pieceGroup.Add(pink);
-	board.addPiece(pink);
-	pieces.push_back(pink);
-
-	Piece *orange = new Piece(ORANGE, player, TextureManager::GetTexture("Bro1Happy"), TextureManager::GetTexture("Bro1Sad"), TextureManager::GetTexture("Bro2Happy"), TextureManager::GetTexture("Bro2Sad"));
-	// orange->setPosition(570.0, 350);
-	pieceGroup.Add(orange);
-	board.addPiece(orange);
-	pieces.push_back(orange);
-
-	pieceGroup.calculate();
-}
-
-int main()
-{
-	// Window
-	const sf::Color WINDOW_COLOR = sf::Color::White;
-	const int WINDOW_WIDTH = 800;
-	const int WINDOW_HEIGHT = 600;
-
-	// Create client object and initialize with socket
-	Client client;
-	sf::TcpSocket socket;
-	client.initailize(socket);
-
-	// Setup window and initialize game elements
-	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
-
-	// Create Texture Manager
+	// Load Textures
 	TextureManager::LoadTexture("Dad1Sad", "Characters", sf::IntRect(0, 0, 296, 340));
 	TextureManager::LoadTexture("Dad1Happy", "Characters", sf::IntRect(0, 440, 296, 340));
 	TextureManager::LoadTexture("Mom1Sad", "Characters", sf::IntRect(440, 0, 430, 278));
@@ -382,6 +247,72 @@ int main()
 	TextureManager::LoadTexture("MH2Happy", "Characters", sf::IntRect(880, 1320, 330, 268));
 	TextureManager::LoadTexture("Bro2Sad", "Characters", sf::IntRect(1320, 880, 250, 295));
 	TextureManager::LoadTexture("Bro2Happy", "Characters", sf::IntRect(1320, 1320, 250, 295));
+
+	HrzLayoutGrp pieceGroup(50, 350, 2);
+
+	// Declare Pieces
+	Piece *green1 = new Piece(GREEN, "Player 1", TextureManager::GetTexture("Dad1Happy"), TextureManager::GetTexture("Dad1Sad"));
+	Piece *green2 = new Piece(GREEN, "Player 2", TextureManager::GetTexture("Dad2Happy"), TextureManager::GetTexture("Dad2Sad"));
+	Piece *blue1 = new Piece(BLUE, "Player 1", TextureManager::GetTexture("Mom1Happy"), TextureManager::GetTexture("Mom1Sad"));
+	Piece *blue2 = new Piece(BLUE, "Player 2", TextureManager::GetTexture("Mom2Happy"), TextureManager::GetTexture("Mom2Sad"));
+	Piece *pink1 = new Piece(PINK, "Player 1", TextureManager::GetTexture("MH1Happy"), TextureManager::GetTexture("MH1Sad"));
+	Piece *pink2 = new Piece(PINK, "Player 2", TextureManager::GetTexture("MH2Happy"), TextureManager::GetTexture("MH2Sad"));
+	Piece *orange1 = new Piece(ORANGE, "Player 1", TextureManager::GetTexture("Bro1Happy"), TextureManager::GetTexture("Bro1Sad"));
+	Piece *orange2 = new Piece(ORANGE, "Player 2", TextureManager::GetTexture("Bro2Happy"), TextureManager::GetTexture("Bro2Sad"));
+
+	if (player == "Player 1")
+	{
+		pieceGroup.Add(green1);
+		pieceGroup.Add(blue1);
+		pieceGroup.Add(pink1);
+		pieceGroup.Add(orange1);
+
+		pieces.push_back(green1);
+		pieces.push_back(blue1);
+		pieces.push_back(pink1);
+		pieces.push_back(orange1);
+	}
+	else
+	{
+		pieceGroup.Add(green2);
+		pieceGroup.Add(blue2);
+		pieceGroup.Add(pink2);
+		pieceGroup.Add(orange2);
+
+		pieces.push_back(green2);
+		pieces.push_back(blue2);
+		pieces.push_back(pink2);
+		pieces.push_back(orange2);
+	}
+
+	// board needs every piece to correctly show both player's moves
+	board.addPiece(green1);
+	board.addPiece(blue1);
+	board.addPiece(pink1);
+	board.addPiece(orange1);
+	board.addPiece(green2);
+	board.addPiece(blue2);
+	board.addPiece(pink2);
+	board.addPiece(orange2);
+
+	pieceGroup.calculate();
+	board.setHrzLayoutGrp(pieceGroup);
+}
+
+int main()
+{
+	// Window
+	const sf::Color WINDOW_COLOR = sf::Color::White;
+	const int WINDOW_WIDTH = 800;
+	const int WINDOW_HEIGHT = 600;
+
+	// Create client object and initialize with socket
+	Client client;
+	sf::TcpSocket socket;
+	client.initailize(socket);
+
+	// Setup window and initialize game elements
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
 
 	// Create Board
 	CardProps cardProps;
@@ -412,23 +343,10 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 
-			// select game board
-			// while (!input.isBoardSelected())
-			// {
-			// 	// TODO: pass .txt file to input, then render board from file???
-			// 	// rendering.clear() will delete all game elements if needed before starting a new game
-			// 	input.selectBoard();
-			// }
-
 			// check if player's turn
 
 			if (client.getIdentity() == client.getPlayerTurn())
 			{
-
-				// if (event.type == sf::Event::MouseButtonPressed)
-				// {
-				// 	continueButton.mousePressed(event);
-				// }
 
 				if (event.type == sf::Event::MouseButtonReleased && !client.hasSelectedPiece())
 				{
@@ -437,7 +355,6 @@ int main()
 
 					if (p != nullptr)
 					{
-
 						client.setSelectedPiece(p);
 						client.setHasSelectedPiece(true);
 					}
@@ -445,7 +362,6 @@ int main()
 
 				if (event.type == sf::Event::MouseButtonReleased && client.hasSelectedPiece())
 				{
-
 					Piece *p = client.getSelectedPiece();
 
 					Vertex *v = board.mouseReleased(event);
@@ -453,12 +369,9 @@ int main()
 					if (v != nullptr)
 					{
 						v->setPiece(*p);
-						v->setHasPiece(true);
-						v->setIsHappy(true);
 						v->setPlayer(client.getIdentity());
 
-						std::vector<std::pair<Vertex *, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);
-						client.sendNeighborColorPacket(changedVetrices, socket);
+						client.sendNeighborColorPacket(board.updateBoard(v->getId()), socket);
 
 						client.setHasSelectedPiece(false);
 						// client.calculateScore(board);

@@ -3,6 +3,7 @@
 
 enum Coalition
 {
+	NONE,
 	ORANGE,
 	BLUE,
 	GREEN,

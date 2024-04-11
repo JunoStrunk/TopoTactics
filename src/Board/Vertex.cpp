@@ -98,7 +98,7 @@ bool Vertex::getHasPiece()
 Coalition Vertex::getCoal()
 {
 	if (!hasPiece)
-		return;
+		return NONE;
 	return piece.getCoal();
 }
 
@@ -160,6 +160,7 @@ void Vertex::setHasPiece(bool hasPiece)
 {
 	this->hasPiece = hasPiece;
 }
+
 void Vertex::setPlayer(std::string identity)
 {
 	playerIdentity = identity;
@@ -169,6 +170,7 @@ void Vertex::setPiece(Piece piece)
 {
 	this->piece = piece;
 	this->piece.setPosition(xpos - piece.getSprite().getGlobalBounds().width / 2.0, ypos - piece.getSprite().getGlobalBounds().height / 2.0);
-	piece.setTex(isHappy);
+	isHappy = true;
 	hasPiece = true;
+	piece.setTex(isHappy);
 }
