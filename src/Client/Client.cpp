@@ -230,7 +230,6 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
-	// Load Textures
 	TextureManager::LoadTexture("Dad1Sad", "CharactersHighlights", sf::IntRect(0, 0, 336, 376));
 	TextureManager::LoadTexture("Dad1Happy", "CharactersHighlights", sf::IntRect(0, 424, 336, 376));
 	TextureManager::LoadTexture("Mom1Sad", "CharactersHighlights", sf::IntRect(472, 0, 464, 308));
@@ -313,6 +312,9 @@ int main()
 
 	// Setup window and initialize game elements
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
+	sf::Texture t;
+	t.loadFromFile("../assets/Background_1.png");
+	sf::Sprite backgroundImage(t);
 
 	// Create Board
 	CardProps cardProps;
@@ -339,6 +341,7 @@ int main()
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+
 			// Close window: exit
 			if (event.type == sf::Event::Closed)
 				window.close();
@@ -386,6 +389,7 @@ int main()
 			}
 		}
 
+		window.draw(backgroundImage);
 		window.draw(board);
 
 		window.display();
