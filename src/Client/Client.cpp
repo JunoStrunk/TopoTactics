@@ -231,22 +231,22 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
 {
 	// Load Textures
-	TextureManager::LoadTexture("Dad1Sad", "Characters", sf::IntRect(0, 0, 296, 340));
-	TextureManager::LoadTexture("Dad1Happy", "Characters", sf::IntRect(0, 440, 296, 340));
-	TextureManager::LoadTexture("Mom1Sad", "Characters", sf::IntRect(440, 0, 430, 278));
-	TextureManager::LoadTexture("Mom1Happy", "Characters", sf::IntRect(440, 440, 430, 278));
-	TextureManager::LoadTexture("MH1Sad", "Characters", sf::IntRect(880, 0, 330, 268));
-	TextureManager::LoadTexture("MH1Happy", "Characters", sf::IntRect(880, 440, 330, 268));
-	TextureManager::LoadTexture("Bro1Sad", "Characters", sf::IntRect(1320, 0, 250, 295));
-	TextureManager::LoadTexture("Bro1Happy", "Characters", sf::IntRect(1320, 440, 250, 295));
-	TextureManager::LoadTexture("Dad2Sad", "Characters", sf::IntRect(0, 880, 296, 340));
-	TextureManager::LoadTexture("Dad2Happy", "Characters", sf::IntRect(0, 1320, 296, 340));
-	TextureManager::LoadTexture("Mom2Sad", "Characters", sf::IntRect(440, 880, 430, 278));
-	TextureManager::LoadTexture("Mom2Happy", "Characters", sf::IntRect(440, 1320, 430, 278));
-	TextureManager::LoadTexture("MH2Sad", "Characters", sf::IntRect(880, 880, 330, 268));
-	TextureManager::LoadTexture("MH2Happy", "Characters", sf::IntRect(880, 1320, 330, 268));
-	TextureManager::LoadTexture("Bro2Sad", "Characters", sf::IntRect(1320, 880, 250, 295));
-	TextureManager::LoadTexture("Bro2Happy", "Characters", sf::IntRect(1320, 1320, 250, 295));
+	TextureManager::LoadTexture("Dad1Sad", "CharactersHighlights", sf::IntRect(0, 0, 336, 376));
+	TextureManager::LoadTexture("Dad1Happy", "CharactersHighlights", sf::IntRect(0, 424, 336, 376));
+	TextureManager::LoadTexture("Mom1Sad", "CharactersHighlights", sf::IntRect(472, 0, 464, 308));
+	TextureManager::LoadTexture("Mom1Happy", "CharactersHighlights", sf::IntRect(472, 424, 464, 308));
+	TextureManager::LoadTexture("MH1Sad", "CharactersHighlights", sf::IntRect(944, 0, 360, 304));
+	TextureManager::LoadTexture("MH1Happy", "CharactersHighlights", sf::IntRect(944, 424, 360, 304));
+	TextureManager::LoadTexture("Bro1Sad", "CharactersHighlights", sf::IntRect(1416, 0, 284, 332));
+	TextureManager::LoadTexture("Bro1Happy", "CharactersHighlights", sf::IntRect(1416, 424, 284, 332));
+	TextureManager::LoadTexture("Dad2Sad", "CharactersHighlights", sf::IntRect(0, 848, 336, 376));
+	TextureManager::LoadTexture("Dad2Happy", "CharactersHighlights", sf::IntRect(0, 1272, 336, 376));
+	TextureManager::LoadTexture("Mom2Sad", "CharactersHighlights", sf::IntRect(472, 848, 464, 308));
+	TextureManager::LoadTexture("Mom2Happy", "CharactersHighlights", sf::IntRect(472, 1272, 464, 308));
+	TextureManager::LoadTexture("MH2Sad", "CharactersHighlights", sf::IntRect(944, 848, 360, 304));
+	TextureManager::LoadTexture("MH2Happy", "CharactersHighlights", sf::IntRect(944, 1272, 360, 304));
+	TextureManager::LoadTexture("Bro2Sad", "CharactersHighlights", sf::IntRect(1416, 848, 284, 332));
+	TextureManager::LoadTexture("Bro2Happy", "CharactersHighlights", sf::IntRect(1416, 1272, 284, 332));
 
 	HrzLayoutGrp pieceGroup(50, 350, 2);
 
