@@ -76,6 +76,33 @@ public:
 		playerTurn = turn;
 	}
 
+	void sendBoardSelectionPacket(sf::TcpSocket &socket, int &boardSelection) 
+	{
+		// create packet to send
+		sf::Packet packet;
+
+		packet << boardSelection;
+
+		if (socket.send(packet) != sf::Socket::Done)
+		{
+			std::cerr << "Error: Failed to send board selection packet to the server" << std::endl;
+			// handle error accordingly
+		}
+
+	}
+
+	int receiveBoardSelectionPacket(sf::TcpSocket &socket) 
+	{
+		sf::Packet packet;
+		if (socket.receive(packet) != sf::Socket::Done)
+		{
+			std::cerr << "Error: Failed to receive board selection packet to the server" << std::endl;
+		}
+		int selectedBoard;
+		packet >> selectedBoard;
+		return selectedBoard;
+	}
+
 	void sendNeighborColorPacket(std::vector<std::pair<Vertex *, sf::Color>> changedVetrices, sf::TcpSocket &socket)
 	{
 		// create packet to send
@@ -146,6 +173,95 @@ public:
 	// 	}
 	// 	std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
 	// }
+};
+
+class MenuButton{
+private:
+	sf::RectangleShape shape;
+	sf::Text text;
+public:
+	MenuButton(const std::string& buttonText, sf::Font& font, sf::Vector2f position){
+		shape.setSize(sf::Vector2f(200, 50));
+		shape.setFillColor(sf::Color::Blue);
+		shape.setPosition(position);
+		text.setString(buttonText);
+		text.setFont(font);
+		text.setCharacterSize(20);
+		text.setFillColor(sf::Color::White);
+		text.setPosition(position.x + 50, position.y + 10);
+	} 
+	void draw(sf::RenderWindow& window) {
+		window.draw(shape);
+		window.draw(text);
+	}
+
+	bool isClicked(sf::Vector2f mousePos) {
+		return shape.getGlobalBounds().contains(mousePos);
+	}
+};
+
+int mainMenu(){
+	const sf::Color WINDOW_COLOR = sf::Color::White;
+	const int WINDOW_WIDTH = 800;
+	const int WINDOW_HEIGHT = 600;
+	sf::RenderWindow menuWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "TopoTactics", sf::Style::Default);
+	sf::Font font;
+	sf::Text text;
+	// MainMenu mainMenu;
+
+	if (!font.loadFromFile("../Fonts/MightySouly-lxggD.ttf"))
+		printMessage("No Font Found");
+
+	text.setFont(font);
+	MenuButton map1("Map 1", font, sf::Vector2f(300, 200));
+	MenuButton map2("Map 2", font, sf::Vector2f(300, 300));
+	MenuButton map3("Map 3", font, sf::Vector2f(300, 400));
+	MenuButton exit("Exit", font, sf::Vector2f(300, 500));
+
+	sf::Text title("TopoTactics", font, 50);
+	title.setPosition(281, 100);
+	title.setFillColor(sf::Color::Blue);
+	// 400 w 100h
+	sf::Event event;
+
+	// game loop
+	while (menuWindow.isOpen()){
+		//Event polling
+
+		while (menuWindow.pollEvent(event)){
+			if (event.type == sf::Event::Closed)
+				menuWindow.close();
+			if (event.type == sf::Event::MouseButtonPressed) {
+				if (map1.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+					std::cout << "Map1 Selected!" << std::endl;
+					menuWindow.close();
+					return 1;
+				}
+				if (map2.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+					std::cout << "Map2 Selected!" << std::endl;
+					menuWindow.close();
+					return 2;
+				}
+				if (map3.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+					std::cout << "Map3 Selected!" << std::endl;
+					menuWindow.close();
+					return 3;
+				}
+				if (exit.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) 
+					menuWindow.close();
+			}
+
+			menuWindow.clear(WINDOW_COLOR);
+			//Draw game
+			map1.draw(menuWindow);
+			map2.draw(menuWindow);
+			map3.draw(menuWindow);
+			exit.draw(menuWindow);
+			menuWindow.draw(title);
+			menuWindow.display();
+		}
+	}
+	return 0;
 };
 
 void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
@@ -310,19 +426,39 @@ int main()
 	sf::TcpSocket socket;
 	client.initailize(socket);
 
-	// Setup window and initialize game elements
-	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
-	sf::Texture t;
-	t.loadFromFile("../assets/Background_1.png");
-	sf::Sprite backgroundImage(t);
-
 	// Create Board
 	CardProps cardProps;
 	VertexProps vertexProps;
 	Coalition coalition;
 	std::vector<Piece *> pieces;
 	Board board;
-	board.loadBoard("../files/board1.txt", vertexProps);
+	//board.loadBoard("../files/board1.txt", vertexProps);
+
+	// Start Main Menu Selection Screen
+	int boardSelected;
+	if (client.getIdentity() == "Player 1"){
+        boardSelected = mainMenu();
+        std::cout << boardSelected;
+        client.sendBoardSelectionPacket(socket, boardSelected);
+    }
+    else {
+        boardSelected = client.receiveBoardSelectionPacket(socket);
+    }
+
+	if (boardSelected == 1)
+		board.loadBoard("../files/board1.txt", vertexProps);
+	else if (boardSelected == 2)
+		board.loadBoard("../files/board2.txt", vertexProps);
+	else if (boardSelected == 3)
+		board.loadBoard("../files/board3.txt", vertexProps);
+	else if (boardSelected == 0)
+		printMessage("Error: No Board Selected");
+
+	// Setup game window and initialize game elements
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), client.getIdentity());
+	sf::Texture t;
+	t.loadFromFile("../assets/Background_1.png");
+	sf::Sprite backgroundImage(t);
 
 	// Create Button
 	Button continueButton(&(TextureManager::GetTexture("continue")), &(TextureManager::GetTexture("continue_clicked")), sf::Vector2f(600.0f, 200.0f));
@@ -330,6 +466,7 @@ int main()
 	continueButton.bindOnClick(continueButtonTest);
 
 	loadPieces(board, pieces, coalition, client.getIdentity());
+
 
 	// Start the message receiving thread
 	std::thread receiveThread(receiveMessages, std::ref(socket), std::ref(board), std::ref(client));
@@ -394,6 +531,9 @@ int main()
 
 		window.display();
 	}
+
+	// delete vertices
+	
 
 	// Disconnect from the server
 	socket.disconnect();

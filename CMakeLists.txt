@@ -42,6 +42,7 @@ file(GLOB_RECURSE CLIENTSRC
 file(COPY "${CMAKE_SOURCE_DIR}/src/Board/files" DESTINATION "${CMAKE_BINARY_DIR}")
 # assets directory
 file(COPY "${CMAKE_SOURCE_DIR}/src/Board/assets" DESTINATION "${CMAKE_BINARY_DIR}")
+file(COPY "${CMAKE_SOURCE_DIR}/src/Client/Fonts" DESTINATION "${CMAKE_BINARY_DIR}")
 
 # ImGui source files
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/imgui")
