@@ -19,6 +19,12 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
 		target.draw(pair.second.first->getShape());
 	}
 
+	for (Card* card : cards) {
+		if (!card->wasPlayed()) {
+			target.draw(card->getSprite());
+		}
+	}
+
 	for (Piece* piece : pieces) {
 		target.draw(piece->getSprite());
 	}
@@ -154,6 +160,10 @@ void Board::addConnection(Vertex *from, Vertex *to)
 	edges.push_back(line);
 }
 
+void Board::addCard(Card *card) {
+	cards.push_back(card);
+}
+
 void Board::addPiece(Piece *piece) {
 	pieces.push_back(piece);
 }
@@ -220,6 +230,19 @@ void Board::mousePressed(sf::Event &event)
 			pair.second.first->setDraggable(true);
 		}
 	}
+}
+
+Card *Board::mouseClickCard(sf::Event &event, std::vector<Card*> &cards) {
+	Card *selected = nullptr;
+	for (Card *card : cards) 
+	{
+		if (card->getSprite().getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) 
+		{
+			selected = card;
+			break;
+		}
+	}
+	return selected;
 }
 
 Piece *Board::mouseClickPiece(sf::Event &event, std::vector<Piece*> &pieces) 

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <vector>
 // client
 const sf::IpAddress IP = "";
 // const sf::IpAddress IP = sf::IpAddress::getLocalAddress();
@@ -26,14 +27,34 @@ class Client
 {
 	std::string identity;
 	std::string playerTurn;
+	Card *selectedCard;
 	Piece *selectedPiece;
+	bool isCardSelected;
 	bool isPieceSelected;
 
+	int currentTurn;
+	// Card IDs: 0 = reserved seating, 1 = embarassing family, 2 = rearrangement, 3 = inside joke
+	// Array contains turns at which the effects of each card end. Begin at 0 (not in effect) and assigned a turn when the card is activated
+	int targetTurn[4];
+	// For use with selecting seats/factions after activating a card
+	int activatingCard;
+	Vertex *reservedSeat;
+	std::vector<Vertex*> guestsToSwap;
+	Coalition insideJoke;
+
 public:
+	int score;
+
 	Client()
 	{
 		selectedPiece = nullptr;
 		isPieceSelected = false;
+		currentTurn = 1;
+		score = 0;
+		for (int i = 0; i < 4; i++) {
+			targetTurn[i] = 0;
+		}
+		activatingCard = -1;
 	};
 
 	void initailize(sf::TcpSocket &socket)
@@ -224,6 +245,10 @@ public:
 		return selectedPiece;
 	}
 
+	bool hasSelectedCard() {
+		return isCardSelected;
+	}
+
 	bool hasSelectedPiece()
 	{
 		return isPieceSelected;
@@ -239,32 +264,65 @@ public:
 		selectedPiece = piece;
 	}
 
-	void calculateScore(Board &board)
-	{
-		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
-		int player1Score = 0;
-		int player2Score = 0;
+	int getActivatingCard() {
+		return activatingCard;
+	}
 
-		for (auto i = graph.begin(); i != graph.end(); i++)
-		{
-			Vertex *v = i->second.first;
+	void setActivatingCard(int card) {
+		activatingCard = card;
+	}
 
-			if (v->getHasPiece())
-			{
-				std::cout << "Vertex Id:" << v->getId() << std::endl;
-				std::cout << "Is Happy: " << v->getIsHappy() << std::endl;
-				std::cout << "Player: " << v->getPlayer() << std::endl;
-			}
-			if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 1")
-			{
-				player1Score++;
-			}
-			else if (v->getHasPiece() == true && v->getIsHappy() == true && v->getPlayer() == "Player 2")
-			{
-				player2Score++;
-			}
+	Vertex* getReservedSeat() {
+		return reservedSeat;
+	}
+
+	void setReservedSeat(Vertex *seat) {
+		reservedSeat = seat;
+	}
+
+	void incrementTurn() {
+		currentTurn++;
+
+		if (currentTurn <= targetTurn[0] && reservedSeat != nullptr) { // end "reserved seating" card effect
+			reservedSeat->setReserved(false);
+			reservedSeat = nullptr;
 		}
-		std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
+		if (currentTurn <= targetTurn[1]) { // end "embarrassing family" effect
+			// TODO (based on how it is implemenented, see the TODO in main)
+		}
+		// no action required here for card id == 2 or 3
+	}
+
+	bool insideJokeInEffect() {
+		return currentTurn <= targetTurn[3];
+	}
+
+	void setTargetTurn(int id, int turns) {
+		targetTurn[id] = currentTurn + turns;
+	}
+
+	void addGuestToSwap(Vertex* vertex) {
+		guestsToSwap.push_back(vertex);
+	}
+
+	bool canSwap() {
+		return guestsToSwap.size() == 2;
+	}
+
+	Vertex* getGuest(int index) {
+		return guestsToSwap[index];
+	}
+
+	void clearGuestsToSwap() {
+		guestsToSwap.clear();
+	}
+
+	Coalition getInsideJoke() {
+		return insideJoke;
+	}
+
+	void setInsideJoke(Coalition coalition) {
+		insideJoke = coalition;
 	}
 };
 
@@ -310,37 +368,39 @@ void receiveMessages(sf::TcpSocket &socket, Board &board, Client &client)
 
 		// calculate score
 		std::map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph = board.getVertexGraph();
-		int player1Score = 0;
-		int player2Score = 0;
 
 		for (auto i = graph.begin(); i != graph.end(); i++)
 		{
 			Vertex *v = i->second.first;
 
-			if (client.getIdentity() == "Player 1")
+			if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red)
 			{
-				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red)
-				{
-					if (v->getPlayer() == "Player 1")
-						player1Score++;
-					else
-						player2Score++;
-				}
-			}
-
-			else
-			{
-				if (v->getColor() != sf::Color::White && v->getOutlineColor() != sf::Color::Red)
-				{
-					if (v->getPlayer() == "Player 2")
-						player2Score++;
-					else
-						player1Score++;
+				if (v->getPlayer() == "Player 1") {
+					client.score++;
+					if (client.insideJokeInEffect() && v->getCoal() == client.getInsideJoke()) {
+						client.score++;
+					}
 				}
 			}
 		}
-		std::cout << "Current score: Player 1 = " << player1Score << ", Player 2 = " << player2Score << std::endl;
+		std::cout << "Current score: " << client.score << std::endl;
 	}
+}
+
+void loadCards(Board &board, std::vector<Card *> &cards)
+{
+	Card* card0 = new Card(0, 100, 325);
+	board.addCard(card0);
+	cards.push_back(card0);
+	Card* card1 = new Card(1, 250, 325);
+	board.addCard(card1);
+	cards.push_back(card1);
+	Card* card2 = new Card(2, 400, 325);
+	board.addCard(card2);
+	cards.push_back(card2);
+	Card* card3 = new Card(3, 550, 325);
+	board.addCard(card3);
+	cards.push_back(card3);
 }
 
 void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition, std::string player)
@@ -390,6 +450,7 @@ int main()
 	CardProps cardProps;
 	VertexProps vertexProps;
 	Coalition coalition;
+	std::vector<Card *> cards;
 	std::vector<Piece *> pieces;
 	Board board;
 	board.loadBoard("../files/board1.txt", vertexProps);
@@ -399,6 +460,7 @@ int main()
 	std::function<void()> continueButtonTest = std::bind(printMessage, "ContinueButtonWorks!");
 	continueButton.bindOnClick(continueButtonTest);
 
+	loadCards(board, cards);
 	loadPieces(board, pieces, coalition, client.getIdentity());
 
 	// Start the message receiving thread
@@ -427,51 +489,96 @@ int main()
 
 			if (client.getIdentity() == client.getPlayerTurn())
 			{
+				if (event.type == sf::Event::MouseButtonReleased) {
+					if (client.getActivatingCard() == 0) { // "Reserved seating"--selecting an empty seat
+						Vertex *v = board.mouseReleased(event);
+						if (v != nullptr)
+						{
+							if (!v->getReserved() && !v->getHasPiece()) // if seat isn't already reserved or has piece, reserve it
+							{
+								v->setReserved(true);
+								v->setPlayer(client.getIdentity());
+								client.setReservedSeat(v);
+								client.setTargetTurn(0, 2); // set reserved seating card effect to end two turns from now
 
-				// if (event.type == sf::Event::MouseButtonPressed)
-				// {
-				// 	continueButton.mousePressed(event);
-				// }
+								// TODO: update vertices with other client
 
-				if (event.type == sf::Event::MouseButtonReleased && !client.hasSelectedPiece())
-				{
+								client.setActivatingCard(-1); // finished, stop card activation
+							}
+						}
+					}
+					else if (client.getActivatingCard() == 1) { // "Embarassing family"--select a faction to make unhappy
+						Piece *p = board.mouseClickPiece(event, pieces);
+						if (p != nullptr) {
+							Coalition embarrassed = p->getCoal();
+							// TODO: update board to make all pieces of the above coalition unhappy
+							client.setTargetTurn(1, 2);
+							client.setActivatingCard(-1);
+						}
+					}
+					else if (client.getActivatingCard() == 2) { // "Rearrangement"--swap two of your guests
+						Vertex *v = board.mouseReleased(event);
+						if (v != nullptr) {
+							if (v->getPlayer() == client.getIdentity()) { // add guest if it belongs to the player
+								client.addGuestToSwap(v);
+							}
+							if (client.canSwap()) { // if  two guests have been clicked on, swap them
+								Coalition v0 = client.getGuest(0)->getCoal();
+								client.getGuest(0)->setCoal(client.getGuest(1)->getCoal());
+								client.getGuest(1)->setCoal(v0);
+								// TODO update board to reflect the swap
+								client.clearGuestsToSwap();
+								client.setActivatingCard(-1);
+							}
+						}
+					}
+					else if (client.getActivatingCard() == 3) { // "Inside joke"--select a faction, your guests of that faction will receive double happiness points
+						Piece *p = board.mouseClickPiece(event, pieces);
+						if (p != nullptr) {
+							client.setInsideJoke(p->getCoal());
+							client.setTargetTurn(3, 1); // set card effect for one turn
+							client.setActivatingCard(-1);
+						}
+					}
+					else if (!client.hasSelectedPiece()) {
+						Card *c = board.mouseClickCard(event, cards);
+						Piece *p = board.mouseClickPiece(event, pieces);
 
-					Piece *p = board.mouseClickPiece(event, pieces);
+						if (c != nullptr) { // Card was clicked
+							client.setActivatingCard(c->getID());
+							c->setPlayed(true);
+						}
+						else if (p != nullptr)
+						{
 
-					if (p != nullptr)
-					{
+							client.setSelectedPiece(p);
+							client.setHasSelectedPiece(true);
+						}
+					}
+					else {
+						Piece *p = client.getSelectedPiece();
 
-						client.setSelectedPiece(p);
-						client.setHasSelectedPiece(true);
+						Vertex *v = board.mouseReleased(event);
+
+						if (v != nullptr)
+						{
+							std::cout << "Reserved?" << v->getReserved() << std::endl;
+							if (!v->getReserved() || (v->getReserved() && v->getPlayer() == client.getIdentity())) { // place piece only if seat isn't reserved by other player
+								v->setIsHappy(true);
+								v->setHasPiece(true);
+								v->setPlayer(client.getIdentity());
+								client.incrementTurn();
+
+								std::vector<std::pair<Vertex *, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);
+								client.sendNeighborColorPacket(changedVetrices, socket);
+
+								client.setHasSelectedPiece(false);
+								// client.calculateScore(board);
+								break;
+							}
+						}
 					}
 				}
-
-				if (event.type == sf::Event::MouseButtonReleased && client.hasSelectedPiece())
-				{
-
-					Piece *p = client.getSelectedPiece();
-
-					Vertex *v = board.mouseReleased(event);
-
-					if (v != nullptr)
-					{
-						v->setIsHappy(true);
-						v->setHasPiece(true);
-						v->setPlayer(client.getIdentity());
-
-						std::vector<std::pair<Vertex *, sf::Color>> changedVetrices = client.setVertexColors(p, v, board);
-						client.sendNeighborColorPacket(changedVetrices, socket);
-
-						client.setHasSelectedPiece(false);
-						// client.calculateScore(board);
-						break;
-					}
-				}
-
-				// if (event.type == sf::Event::MouseMoved)
-				// {
-				// 	board.mouseMoved(event);
-				// }
 			}
 		}
 

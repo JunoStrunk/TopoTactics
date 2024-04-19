@@ -28,4 +28,5 @@ public:
 	// Setters
 	void setPosition(float x, float y);
 	void setSelected(bool selected);
+	void setCoal(Coalition coalition);
 };

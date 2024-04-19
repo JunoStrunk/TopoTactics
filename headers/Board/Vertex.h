@@ -19,6 +19,7 @@ class Vertex : public sf::Drawable
 	bool isHappy;
 	bool hasPiece; 
 	std::string playerIdentity;
+	bool reserved;
 
 public:
 	// Vertex constructor
@@ -41,6 +42,8 @@ public:
 	bool getIsHappy();
 	bool getHasPiece();
 	std::string getPlayer();
+	bool getReserved();
+	Coalition getCoal();
 
 	// Setters
 	void setHovered(bool hover);
@@ -52,4 +55,6 @@ public:
 	void setIsHappy(bool happy);
 	void setHasPiece(bool hasPiece);
 	void setPlayer(std::string identity);
+	void setReserved(bool value);
+	void setCoal(Coalition coalition);
 };
