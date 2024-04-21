@@ -6,6 +6,9 @@ Board::~Board()
 	{
 		delete pair.second.first;
 	}
+
+	for (Piece *p : pieces)
+		delete p;
 }
 
 void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -350,7 +353,7 @@ void Board::mousePressed(sf::Event &event)
 	}
 }
 
-Piece *Board::mouseClickPiece(sf::Event &event, std::vector<Piece *> &pieces)
+Piece *Board::mouseClickPiece(sf::Event &event)
 {
 	Piece *selected = nullptr;
 	for (Piece *piece : pieces)

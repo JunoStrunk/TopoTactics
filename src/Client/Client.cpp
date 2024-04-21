@@ -76,7 +76,7 @@ public:
 		playerTurn = turn;
 	}
 
-	void sendBoardSelectionPacket(sf::TcpSocket &socket, int &boardSelection) 
+	void sendBoardSelectionPacket(sf::TcpSocket &socket, int &boardSelection)
 	{
 		// create packet to send
 		sf::Packet packet;
@@ -88,10 +88,9 @@ public:
 			std::cerr << "Error: Failed to send board selection packet to the server" << std::endl;
 			// handle error accordingly
 		}
-
 	}
 
-	int receiveBoardSelectionPacket(sf::TcpSocket &socket) 
+	int receiveBoardSelectionPacket(sf::TcpSocket &socket)
 	{
 		sf::Packet packet;
 		if (socket.receive(packet) != sf::Socket::Done)
@@ -175,12 +174,15 @@ public:
 	// }
 };
 
-class MenuButton{
+class MenuButton
+{
 private:
 	sf::RectangleShape shape;
 	sf::Text text;
+
 public:
-	MenuButton(const std::string& buttonText, sf::Font& font, sf::Vector2f position){
+	MenuButton(const std::string &buttonText, sf::Font &font, sf::Vector2f position)
+	{
 		shape.setSize(sf::Vector2f(200, 50));
 		shape.setFillColor(sf::Color::Blue);
 		shape.setPosition(position);
@@ -189,18 +191,21 @@ public:
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
 		text.setPosition(position.x + 50, position.y + 10);
-	} 
-	void draw(sf::RenderWindow& window) {
+	}
+	void draw(sf::RenderWindow &window)
+	{
 		window.draw(shape);
 		window.draw(text);
 	}
 
-	bool isClicked(sf::Vector2f mousePos) {
+	bool isClicked(sf::Vector2f mousePos)
+	{
 		return shape.getGlobalBounds().contains(mousePos);
 	}
 };
 
-int mainMenu(){
+int mainMenu()
+{
 	const sf::Color WINDOW_COLOR = sf::Color::White;
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
@@ -225,34 +230,40 @@ int mainMenu(){
 	sf::Event event;
 
 	// game loop
-	while (menuWindow.isOpen()){
-		//Event polling
+	while (menuWindow.isOpen())
+	{
+		// Event polling
 
-		while (menuWindow.pollEvent(event)){
+		while (menuWindow.pollEvent(event))
+		{
 			if (event.type == sf::Event::Closed)
 				menuWindow.close();
-			if (event.type == sf::Event::MouseButtonPressed) {
-				if (map1.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+			if (event.type == sf::Event::MouseButtonPressed)
+			{
+				if (map1.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+				{
 					std::cout << "Map1 Selected!" << std::endl;
 					menuWindow.close();
 					return 1;
 				}
-				if (map2.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+				if (map2.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+				{
 					std::cout << "Map2 Selected!" << std::endl;
 					menuWindow.close();
 					return 2;
 				}
-				if (map3.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) {
+				if (map3.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+				{
 					std::cout << "Map3 Selected!" << std::endl;
 					menuWindow.close();
 					return 3;
 				}
-				if (exit.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y))) 
+				if (exit.isClicked(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
 					menuWindow.close();
 			}
 
 			menuWindow.clear(WINDOW_COLOR);
-			//Draw game
+			// Draw game
 			map1.draw(menuWindow);
 			map2.draw(menuWindow);
 			map3.draw(menuWindow);
@@ -381,11 +392,6 @@ void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition
 		pieceGroup.Add(blue1);
 		pieceGroup.Add(pink1);
 		pieceGroup.Add(orange1);
-
-		pieces.push_back(green1);
-		pieces.push_back(blue1);
-		pieces.push_back(pink1);
-		pieces.push_back(orange1);
 	}
 	else
 	{
@@ -393,11 +399,6 @@ void loadPieces(Board &board, std::vector<Piece *> &pieces, Coalition &coalition
 		pieceGroup.Add(blue2);
 		pieceGroup.Add(pink2);
 		pieceGroup.Add(orange2);
-
-		pieces.push_back(green2);
-		pieces.push_back(blue2);
-		pieces.push_back(pink2);
-		pieces.push_back(orange2);
 	}
 
 	// board needs every piece to correctly show both player's moves
@@ -432,18 +433,20 @@ int main()
 	Coalition coalition;
 	std::vector<Piece *> pieces;
 	Board board;
-	//board.loadBoard("../files/board1.txt", vertexProps);
+	// board.loadBoard("../files/board1.txt", vertexProps);
 
 	// Start Main Menu Selection Screen
 	int boardSelected;
-	if (client.getIdentity() == "Player 1"){
-        boardSelected = mainMenu();
-        std::cout << boardSelected;
-        client.sendBoardSelectionPacket(socket, boardSelected);
-    }
-    else {
-        boardSelected = client.receiveBoardSelectionPacket(socket);
-    }
+	if (client.getIdentity() == "Player 1")
+	{
+		boardSelected = mainMenu();
+		std::cout << boardSelected;
+		client.sendBoardSelectionPacket(socket, boardSelected);
+	}
+	else
+	{
+		boardSelected = client.receiveBoardSelectionPacket(socket);
+	}
 
 	if (boardSelected == 1)
 		board.loadBoard("../files/board1.txt", vertexProps);
@@ -466,7 +469,6 @@ int main()
 	continueButton.bindOnClick(continueButtonTest);
 
 	loadPieces(board, pieces, coalition, client.getIdentity());
-
 
 	// Start the message receiving thread
 	std::thread receiveThread(receiveMessages, std::ref(socket), std::ref(board), std::ref(client));
@@ -491,7 +493,7 @@ int main()
 				if (event.type == sf::Event::MouseButtonReleased && !client.hasSelectedPiece())
 				{
 
-					Piece *p = board.mouseClickPiece(event, pieces);
+					Piece *p = board.mouseClickPiece(event);
 
 					if (p != nullptr)
 					{
@@ -531,9 +533,6 @@ int main()
 
 		window.display();
 	}
-
-	// delete vertices
-	
 
 	// Disconnect from the server
 	socket.disconnect();

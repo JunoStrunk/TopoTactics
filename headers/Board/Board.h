@@ -50,5 +50,5 @@ public:
 	void mouseMoved(sf::Event &event);
 	Vertex *mouseReleased(sf::Event &event);
 	void mousePressed(sf::Event &event);
-	Piece *mouseClickPiece(sf::Event &event, std::vector<Piece *> &pieces);
+	Piece *mouseClickPiece(sf::Event &event);
 };
