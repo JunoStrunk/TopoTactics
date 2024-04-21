@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include "Vertex.h"
+#include "Card.h"
 #include "HrzLayoutGrp.h"
 #include "Piece.h"
 #include "Line.h"
@@ -15,6 +16,7 @@ class Board : public sf::Drawable
 {
 private:
 	bool editing = false;
+	std::vector<Card *> cards;
 	std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> graph; // Key: , Value pair<from, to vector>
 	std::vector<Piece *> pieces;
 	std::vector<Line> edges;
@@ -42,6 +44,7 @@ public:
 	void setHrzLayoutGrp(HrzLayoutGrp ps);
 	bool addVertex(Vertex *v);
 	void addConnection(Vertex *from, Vertex *to);
+	void addCard(Card *card);
 	void addPiece(Piece *piece);
 	std::unordered_map<int, std::pair<Vertex *, std::vector<Vertex *>>> getConnection();
 	void updateEdge(int id, float x, float y);
@@ -50,5 +53,6 @@ public:
 	void mouseMoved(sf::Event &event);
 	Vertex *mouseReleased(sf::Event &event);
 	void mousePressed(sf::Event &event);
-	Piece *mouseClickPiece(sf::Event &event);
+	Card *mouseClickCard(sf::Event &event, std::vector<Card *> &cards);
+	Piece *mouseClickPiece(sf::Event &event
 };

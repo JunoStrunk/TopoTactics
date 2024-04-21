@@ -78,6 +78,11 @@ void Piece::setSelected(bool selected)
 	this->selected = selected;
 }
 
+void Piece::setCoal(Coalition coalition)
+{
+	coal = coalition;
+}
+
 void Piece::setTex(bool isHappy)
 {
 	if (isHappy)

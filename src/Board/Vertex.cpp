@@ -94,6 +94,14 @@ bool Vertex::getHasPiece()
 {
 	return hasPiece;
 }
+bool Vertex::getReserved()
+{
+	return reserved;
+}
+Coalition Vertex::getCoal()
+{
+	return piece->getCoal();
+}
 
 Coalition Vertex::getCoal()
 {
@@ -164,6 +172,16 @@ void Vertex::setHasPiece(bool hasPiece)
 void Vertex::setPlayer(std::string identity)
 {
 	playerIdentity = identity;
+}
+
+void Vertex::setReserved(bool value)
+{
+	reserved = value;
+}
+
+void Vertex::setCoal(Coalition coalition)
+{
+	piece->setCoal(coalition);
 }
 
 void Vertex::setPiece(Piece piece)
