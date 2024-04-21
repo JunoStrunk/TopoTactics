@@ -35,19 +35,14 @@ file(GLOB_RECURSE CLIENTSRC
 "${CMAKE_SOURCE_DIR}/src/Board/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/Cards/*.cpp"
 "${CMAKE_SOURCE_DIR}/src/UI/*.cpp"
+"${CMAKE_SOURCE_DIR}/src/TextureManager.cpp"
 "${CMAKE_SOURCE_DIR}/src/Client/*.cpp")
-
-file(GLOB_RECURSE TESTSRC
-"${CMAKE_SOURCE_DIR}/src/Board/*.cpp"
-"${CMAKE_SOURCE_DIR}/src/Cards/*.cpp"
-"${CMAKE_SOURCE_DIR}/src/UI/*.cpp"
-"${CMAKE_SOURCE_DIR}/src/Client/TextureManager.cpp"
-"${CMAKE_SOURCE_DIR}/Test.cpp")
 
 # text file directory
 file(COPY "${CMAKE_SOURCE_DIR}/src/Board/files" DESTINATION "${CMAKE_BINARY_DIR}")
 # assets directory
 file(COPY "${CMAKE_SOURCE_DIR}/src/Board/assets" DESTINATION "${CMAKE_BINARY_DIR}")
+file(COPY "${CMAKE_SOURCE_DIR}/src/Client/Fonts" DESTINATION "${CMAKE_BINARY_DIR}")
 
 # ImGui source files
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/imgui")
@@ -72,12 +67,5 @@ target_link_libraries(TTClient sfml-window sfml-graphics sfml-network)
 target_include_directories(TTClient PRIVATE ${INCLUDE_DIR})
 target_compile_features(TTClient PRIVATE cxx_std_17)
 
-add_executable(Test ${TESTSRC} ${IMGUI_SOURCES})
-target_link_libraries(Test sfml-window sfml-graphics OpenGL::GL)
-target_include_directories(Test PRIVATE ${IMGUI_DIR})
-target_include_directories(Test PRIVATE ${INCLUDE_DIR})
-target_compile_features(Test PRIVATE cxx_std_17)
-
 install(TARGETS TTServer)
 install(TARGETS TTClient)
-install(TARGETS Test)

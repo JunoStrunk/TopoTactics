@@ -8,7 +8,7 @@
 class Vertex : public sf::Drawable
 {
 	int id;
-	Piece *piece;
+	Piece piece;
 	VertexProps *props;
 	sf::CircleShape shape;
 	bool hovered;
@@ -17,7 +17,7 @@ class Vertex : public sf::Drawable
 	float xpos;
 	float ypos;
 	bool isHappy;
-	bool hasPiece; 
+	bool hasPiece;
 	std::string playerIdentity;
 	bool reserved;
 
@@ -25,8 +25,6 @@ public:
 	// Vertex constructor
 	Vertex(int id, float x, float y, VertexProps *props);
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-
-	// Serialization
 
 	// Getters
 	int getId() const;
@@ -57,4 +55,5 @@ public:
 	void setPlayer(std::string identity);
 	void setReserved(bool value);
 	void setCoal(Coalition coalition);
+	void setPiece(Piece piece);
 };

@@ -14,6 +14,8 @@ class TextureManager
 
 public:
 	static void LoadTexture(string fileName);
+	static void LoadTexture(string fileName, sf::IntRect bounds);
+	static void LoadTexture(string mapName, string fileName, sf::IntRect bounds);
 	static sf::Texture &GetTexture(string textureName);
 	static void Clear(); // call this once at the end of main
 };

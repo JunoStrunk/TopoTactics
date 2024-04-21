@@ -60,6 +60,32 @@ int main()
 		return 1;
 	}
 
+
+	// Receive message from player 1
+	sf::Packet boardPacket;
+	sf::Socket::Status player1BoardStatus = player1.receive(boardPacket);
+	if (player1BoardStatus != sf::Socket::Done)
+	{
+		std::cerr << "Error: Failed to receive board selection packet from player 1" << std::endl;
+		
+	}
+	// else if (player1Status == sf::Socket::Done)
+	// {
+
+	// 	playerTurn = "Player 2";
+	// 	boardPacket << playerTurn;
+	// }
+
+	//
+	// Packet received form client 1, send packet back to player 1 
+	if (player2.send(boardPacket) != sf::Socket::Done)
+	{
+		std::cerr << "Error: Failed to send board selection packet to player 2" << std::endl;
+		
+	}
+
+
+
 	// Loop for turn-based messaging
 	while (true)
 	{
